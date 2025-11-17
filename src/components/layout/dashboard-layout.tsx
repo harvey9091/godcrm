@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signOut } from '@/lib/supabase/auth'
 import { motion } from 'motion/react'
+import { useTheme } from './theme-provider'
 
 const dashboardItems = [
   { label: 'Dashboard', href: '/dashboard', icon: '📊' },
@@ -17,6 +18,7 @@ const dashboardItems = [
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(true)
   const router = useRouter()
+  const { effectiveTheme } = useTheme()
 
   // Removed useEffect that was causing cascading renders warning
   // The sidebar is initialized as open by default above
@@ -33,7 +35,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className={`flex h-screen ${effectiveTheme === 'dark' ? 'bg-black' : 'bg-gray-50'}`}>
       <Sidebar open={open} setOpen={setOpen} onSignOut={handleSignOut}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -56,7 +58,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <SidebarSignOut onSignOut={handleSignOut} />
         </SidebarBody>
       </Sidebar>
-      <main className="flex-1 overflow-auto p-6">
+      <main className={`flex-1 overflow-auto p-6 ${effectiveTheme === 'dark' ? 'bg-black' : 'bg-gray-50'}`}>
         {children}
       </main>
       {/* Floating dock is installed but not used as per requirements */}

@@ -21,11 +21,13 @@ const chartData = [
   { name: 'Jun', clients: 3, revenue: 3800 },
 ]
 
-// Mock KPI data
+// Updated KPI data with all requested metrics
 const kpiData = [
   { title: 'Total Clients', value: '24', change: '+2 from last month' },
   { title: 'New Clients', value: '4', change: '+1 from last month' },
-  { title: 'Monthly Revenue', value: '$12,400', change: '+15% from last month' },
+  { title: 'Revenue', value: '$12,400', change: '+15% from last month' },
+  { title: 'Outreaches Done', value: '18', change: '+3 from last week' },
+  { title: 'Follow Ups Pending', value: '7', change: '-2 from last week' },
 ]
 
 export default function DashboardPage() {
@@ -61,12 +63,12 @@ export default function DashboardPage() {
             <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
             <div className="h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="h-32 bg-gray-200 rounded animate-pulse"></div>
             ))}
           </div>
-          <div className="h-80 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-96 bg-gray-200 rounded animate-pulse"></div>
           <div className="flex flex-wrap gap-4">
             <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
             <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
@@ -87,20 +89,20 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        {/* Hero Section */}
+        {/* Hero Section - stacked vertically and left-aligned */}
         <div className="space-y-4">
           <TypingAnimation 
             className="text-4xl font-bold"
           >
-            Welcome to GodCRM
+            GodCRM
           </TypingAnimation>
           <AnimatedShinyText className="text-xl">
             Your creative agency management solution
           </AnimatedShinyText>
         </div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* KPI Cards - updated to 5 cards */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
           {kpiData.map((kpi, index) => (
             <Card key={index}>
               <CardHeader>
@@ -114,7 +116,7 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Chart Section */}
+        {/* Chart Section - increased height */}
         <div className="grid grid-cols-1 gap-6">
           <Card>
             <CardHeader>
@@ -125,7 +127,7 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
+              <div className="h-96"> {/* Increased height from h-80 to h-96 */}
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={chartData}
