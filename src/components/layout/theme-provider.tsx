@@ -50,15 +50,30 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (theme !== 'system') {
       localStorage.setItem('theme', theme)
     }
-    
-    // Update effective theme when theme changes
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const effective = theme === 'system' 
-      ? (systemPrefersDark ? 'dark' : 'light')
-      : theme
+  }, [theme])
+  
+  useEffect(() => {
+    // Handle system theme changes
+    const handleSystemThemeChange = () => {
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const newEffectiveTheme = theme === 'system' 
+        ? (systemPrefersDark ? 'dark' : 'light')
+        : theme
       
-    setEffectiveTheme(effective)
-    document.documentElement.classList.toggle('dark', effective === 'dark')
+      setEffectiveTheme(newEffectiveTheme)
+      document.documentElement.classList.toggle('dark', newEffectiveTheme === 'dark')
+    }
+    
+    // Apply theme immediately
+    handleSystemThemeChange()
+    
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    mediaQuery.addEventListener('change', handleSystemThemeChange)
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleSystemThemeChange)
+    }
   }, [theme])
 
   return (
