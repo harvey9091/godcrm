@@ -42,7 +42,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Apply theme to document when component mounts
-    document.documentElement.classList.toggle('dark', effectiveTheme === 'dark')
+    const root = document.documentElement
+    root.classList.remove('light', 'dark')
+    root.classList.add(effectiveTheme)
+    
+    // Also apply to body for consistency
+    const body = document.body
+    body.classList.remove('light', 'dark')
+    body.classList.add(effectiveTheme)
   }, [effectiveTheme])
 
   useEffect(() => {
@@ -61,7 +68,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         : theme
       
       setEffectiveTheme(newEffectiveTheme)
-      document.documentElement.classList.toggle('dark', newEffectiveTheme === 'dark')
+      
+      // Apply theme classes
+      const root = document.documentElement
+      root.classList.remove('light', 'dark')
+      root.classList.add(newEffectiveTheme)
+      
+      const body = document.body
+      body.classList.remove('light', 'dark')
+      body.classList.add(newEffectiveTheme)
     }
     
     // Apply theme immediately

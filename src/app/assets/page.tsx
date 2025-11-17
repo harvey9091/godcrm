@@ -48,9 +48,15 @@ export default function AssetsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-      </div>
+      <DashboardLayout>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div className="h-10 bg-gray-200 rounded animate-pulse w-1/4"></div>
+            <div className="h-10 bg-gray-200 rounded animate-pulse w-32"></div>
+          </div>
+          <div className="h-96 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+      </DashboardLayout>
     )
   }
 

@@ -34,7 +34,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className={`flex h-screen ${effectiveTheme === 'dark' ? 'bg-black' : 'bg-gray-50'}`}>
+    <div className="flex h-screen bg-background">
       <Sidebar open={open} setOpen={setOpen} onSignOut={handleSignOut}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -57,7 +57,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <SidebarSignOut onSignOut={handleSignOut} />
         </SidebarBody>
       </Sidebar>
-      <main className={`flex-1 overflow-auto p-6 ${effectiveTheme === 'dark' ? 'bg-black' : 'bg-gray-50'}`}>
+      <main className="flex-1 overflow-auto p-6 bg-background">
         {children}
       </main>
       {/* Floating dock is installed but not used as per requirements */}
