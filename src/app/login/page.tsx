@@ -7,7 +7,7 @@ import { getSession } from '@/lib/supabase/auth'
 
 export default function Page() {
   const router = useRouter()
-  const [isMounted, setIsMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const checkSession = async () => {
@@ -17,17 +17,17 @@ export default function Page() {
           router.push('/dashboard')
         }
       } catch (error) {
-        console.error('Error checking session:', error)
+        console.debug('No active session found, staying on login page:', error)
+        // Intentionally ignoring error as it's expected when not authenticated
       } finally {
-        // Move setIsMounted to the finally block to avoid setState in effect
-        setIsMounted(true)
+        setLoading(false)
       }
     }
 
     checkSession()
   }, [router])
 
-  if (!isMounted) {
+  if (loading) {
     return (
       <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-sm">

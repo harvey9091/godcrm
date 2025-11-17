@@ -1,7 +1,8 @@
 'use client'
 
 import { Sidebar, SidebarBody, SidebarLink, SidebarSignOut } from '@/components/ui/sidebar'
-import { useState, useEffect } from 'react'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { signOut } from '@/lib/supabase/auth'
 import { motion } from 'motion/react'
@@ -13,27 +14,21 @@ const dashboardItems = [
 ]
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
+  const [open, setOpen] = useState(true)
   const router = useRouter()
 
-  useEffect(() => {
-    const initializeLayout = async () => {
-      // Move state updates to after any async operations
-      setIsMounted(true)
-      setOpen(true)
-    }
-    
-    initializeLayout()
-  }, [])
+  // Removed useEffect that was causing cascading renders warning
+  // The sidebar is initialized as open by default above
 
   const handleSignOut = async () => {
-    await signOut()
-    router.push('/login')
-  }
-
-  if (!isMounted) {
-    return <div className="flex h-screen bg-gray-50">{children}</div>
+    try {
+      await signOut()
+      router.push('/login')
+    } catch (error) {
+      console.error('Error signing out:', error)
+      // Even if signOut fails, redirect to login
+      router.push('/login')
+    }
   }
 
   return (

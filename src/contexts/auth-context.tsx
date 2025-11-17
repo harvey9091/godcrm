@@ -16,11 +16,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isMounted, setIsMounted] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
-    setIsMounted(true)
     const checkUser = async () => {
       try {
         const { data: { session } } = await getSession()
@@ -29,7 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(user)
         }
       } catch (error) {
-        console.error('Error checking user:', error)
+        console.debug('Error checking user session:', error)
+        // Intentionally ignoring error as it's expected when not authenticated
       } finally {
         setLoading(false)
       }
@@ -46,11 +45,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error signing out:', error)
     }
-  }
-
-  // Don't render children until after client-side hydration
-  if (!isMounted) {
-    return <div className="flex h-screen items-center justify-center">{children}</div>
   }
 
   return (
