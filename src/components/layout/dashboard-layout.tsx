@@ -2,7 +2,7 @@
 
 import { Sidebar, SidebarBody, SidebarLink, SidebarSignOut } from '@/components/ui/sidebar'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signOut } from '@/lib/supabase/auth'
 import { motion } from 'motion/react'
@@ -11,6 +11,7 @@ const dashboardItems = [
   { label: 'Dashboard', href: '/dashboard', icon: '📊' },
   { label: 'Clients', href: '/clients', icon: '👥' },
   { label: 'Assets', href: '/assets', icon: '📁' },
+  { label: 'Settings', href: '/settings', icon: '⚙️' },
 ]
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
