@@ -11,9 +11,13 @@ export default function SettingsPage() {
   const [isMounted, setIsMounted] = useState(false)
 
   // This ensures we only render theme-dependent content after hydration
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    setIsMounted(true)
+    // Use setTimeout to avoid cascading renders warning
+    const timer = setTimeout(() => {
+      setIsMounted(true)
+    }, 0)
+    
+    return () => clearTimeout(timer)
   }, [])
 
   const toggleTheme = () => {

@@ -1,7 +1,6 @@
 'use client'
 
 import { Sidebar, SidebarBody, SidebarLink, SidebarSignOut } from '@/components/ui/sidebar'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signOut } from '@/lib/supabase/auth'
