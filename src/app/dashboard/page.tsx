@@ -150,8 +150,10 @@ export default function DashboardPage() {
           >
             GodCRM
           </TypingAnimation>
-          <AnimatedShinyText className="text-sm text-muted-foreground mt-1">
-            Your creative agency management solution
+          <AnimatedShinyText 
+            className="block text-sm text-muted-foreground mt-1 text-left w-full max-w-none mx-0"
+            shimmerWidth={100}
+          >            Your creative agency management solution
           </AnimatedShinyText>
         </div>
 
