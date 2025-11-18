@@ -142,7 +142,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-[calc(100vh-64px)]">
+      <div className="flex flex-col h-[calc(100vh-80px)]">
         {/* Hero Section - stacked vertically and left-aligned */}
         <div className="flex-shrink-0">
           <TypingAnimation 
@@ -151,9 +151,10 @@ export default function DashboardPage() {
             GodCRM
           </TypingAnimation>
           <AnimatedShinyText 
-            className="block text-sm text-muted-foreground mt-1 text-left w-full max-w-none mx-0"
+            className="block text-base text-muted-foreground mt-1 text-left w-full max-w-none mx-0"
             shimmerWidth={100}
-          >            Your creative agency management solution
+          >
+            Your creative agency management solution
           </AnimatedShinyText>
         </div>
 
@@ -167,43 +168,43 @@ export default function DashboardPage() {
                   <div className="mr-2 text-primary">
                     {kpi.icon}
                   </div>
-                  <CardTitle className="text-xs font-medium text-muted-foreground">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
                     {kpi.title}
                   </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="pb-3">
-                <div className="text-xl font-bold">{kpi.value}</div>
-                <p className="text-xs text-muted-foreground mt-1">{kpi.change}</p>
+                <div className="text-2xl font-bold">{kpi.value}</div>
+                <p className="text-sm text-muted-foreground mt-1">{kpi.change}</p>
               </CardContent>
             </Card>
           ))}
         </div>
 
         {/* Main Content - Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 flex-grow min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 flex-grow min-h-0">
           {/* Left Column - Larger */}
-          <div className="lg:col-span-2 space-y-3 flex flex-col">
-            {/* Agency Revenue Trend Chart */}
-            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-shrink-0">
+          <div className="lg:col-span-3 space-y-3 flex flex-col">
+            {/* Revenue Trend Chart - Now Taller */}
+            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-grow flex flex-col">
               <CardHeader className="pb-2 pt-3">
-                <CardTitle className="text-base font-semibold">
-                  Agency Revenue Trend
+                <CardTitle className="text-lg font-semibold">
+                  Revenue Trend
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pb-3">
-                <div className="h-[200px]">
+              <CardContent className="pb-3 flex-grow flex flex-col">
+                <div className="flex-grow min-h-[350px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--primary)/0.2)" />
                       <XAxis 
                         dataKey="name" 
                         stroke="#ec4899" 
-                        tick={{ fill: '#ec4899', fontSize: 10 }}
+                        tick={{ fill: '#ec4899', fontSize: 14 }}
                       />
                       <YAxis 
                         stroke="#ec4899" 
-                        tick={{ fill: '#ec4899', fontSize: 10 }}
+                        tick={{ fill: '#ec4899', fontSize: 14 }}
                       />
                       <Tooltip 
                         contentStyle={{ 
@@ -241,15 +242,15 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Latest Projects List */}
-            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-grow flex flex-col">
-              <CardHeader className="pb-2 pt-3 flex-shrink-0">
-                <CardTitle className="text-base font-semibold">
+            {/* Latest Clients - Now Shorter */}
+            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-shrink-0">
+              <CardHeader className="pb-2 pt-3">
+                <CardTitle className="text-lg font-semibold">
                   Latest Clients
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pb-3 flex-grow flex flex-col">
-                <div className="flex-grow overflow-y-auto custom-scrollbar">
+              <CardContent className="pb-3">
+                <div className="h-[180px] overflow-y-auto custom-scrollbar">
                   <div className="space-y-2">
                     {latestClients.map((client) => (
                       <div key={client.id} className="flex items-center p-2 rounded-lg bg-background/20 hover:bg-background/30 transition-all duration-200 border border-white/5">
@@ -257,12 +258,12 @@ export default function DashboardPage() {
                           <TrendingUp className="h-4 w-4 text-primary" />
                         </div>
                         <div className="flex-grow">
-                          <h4 className="font-medium text-xs">{client.name}</h4>
-                          <p className="text-xs text-muted-foreground">{client.company || 'No company'}</p>
+                          <h4 className="font-medium text-base">{client.name}</h4>
+                          <p className="text-sm text-muted-foreground">{client.company || 'No company'}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs">{client.email}</p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-sm">{client.email}</p>
+                          <p className="text-sm text-muted-foreground">
                             {client.created_at ? new Date(client.created_at).toLocaleDateString() : ''}
                           </p>
                         </div>
@@ -282,18 +283,18 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* Right Column - Narrower */}
+          {/* Right Column - Slimmer */}
           <div className="lg:col-span-1 space-y-3 flex flex-col">
             {/* Revenue Breakdown Donut Chart */}
             <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-grow flex flex-col">
               <CardHeader className="pb-2 pt-3 flex-shrink-0">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-base font-semibold">
+                  <CardTitle className="text-lg font-semibold">
                     Revenue Breakdown
                   </CardTitle>
                   <div className="flex space-x-1">
                     <Select>
-                      <SelectTrigger className="w-[80px] h-7 text-xs">
+                      <SelectTrigger className="w-[70px] h-7 text-sm">
                         <SelectValue placeholder="30d" />
                       </SelectTrigger>
                       <SelectContent>
@@ -302,7 +303,7 @@ export default function DashboardPage() {
                         <SelectItem value="90">90d</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Button variant="outline" size="sm" className="h-7 text-xs px-2">
+                    <Button variant="outline" size="sm" className="h-7 text-sm px-2">
                       Details
                     </Button>
                   </div>
@@ -310,15 +311,15 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="pb-3 flex-grow flex flex-col justify-center">
                 <div className="flex flex-col items-center">
-                  <div className="relative w-32 h-32">
+                  <div className="relative w-28 h-28">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
                           data={revenueData}
                           cx="50%"
                           cy="50%"
-                          innerRadius={40}
-                          outerRadius={55}
+                          innerRadius={35}
+                          outerRadius={45}
                           paddingAngle={2}
                           dataKey="value"
                           stroke="hsl(var(--background))"
@@ -340,8 +341,8 @@ export default function DashboardPage() {
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <div className="text-xl font-bold text-primary drop-shadow-[0_0_4px_rgba(147,51,234,0.5)]">72%</div>
-                      <span className="text-xs text-muted-foreground text-center mt-0.5">+12%</span>
+                      <div className="text-2xl font-bold text-primary drop-shadow-[0_0_4px_rgba(147,51,234,0.5)]">72%</div>
+                      <span className="text-sm text-muted-foreground text-center mt-0.5">+12%</span>
                     </div>
                   </div>
                   <div className="mt-2 grid grid-cols-1 gap-1 w-full">
@@ -351,8 +352,8 @@ export default function DashboardPage() {
                           className="w-2 h-2 rounded-full mr-1.5" 
                           style={{ backgroundColor: item.color }}
                         ></div>
-                        <span className="text-xs flex-grow truncate">{item.name}</span>
-                        <span className="text-xs font-medium">${(item.value/1000).toFixed(0)}k</span>
+                        <span className="text-base flex-grow truncate">{item.name}</span>
+                        <span className="text-base font-medium">${(item.value/1000).toFixed(0)}k</span>
                       </div>
                     ))}
                   </div>
@@ -364,10 +365,10 @@ export default function DashboardPage() {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-2 pt-4 flex-shrink-0">
-          <RainbowButton onClick={() => router.push('/clients')} className="h-9 px-3 text-sm">
+          <RainbowButton onClick={() => router.push('/clients')} className="h-9 px-3 text-base">
             Manage Clients
           </RainbowButton>
-          <RainbowButton onClick={() => router.push('/assets')} className="h-9 px-3 text-sm">
+          <RainbowButton onClick={() => router.push('/assets')} className="h-9 px-3 text-base">
             View Assets
           </RainbowButton>
         </div>
