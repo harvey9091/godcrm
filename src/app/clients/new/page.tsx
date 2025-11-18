@@ -171,13 +171,13 @@ export default function NewClientPage() {
               Add New Client
             </AnimatedGradientText>
           </h1>
-          <Button onClick={() => router.back()} variant="outline">
+          <Button onClick={() => router.back()} variant="outline" className="h-10 rounded-lg">
             Back to Clients
           </Button>
         </div>
 
-        <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg">
-          <CardHeader>
+        <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
+          <CardHeader className="pb-4 pt-5">
             <CardTitle>Add New Client for Outreach</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -187,14 +187,14 @@ export default function NewClientPage() {
                 <div className="space-y-6">
                   {/* Client Info Panel */}
                   <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
-                    <CardHeader className="pb-3">
+                    <CardHeader className="pb-4 pt-5">
                       <CardTitle className="text-lg flex items-center">
                         <IconUser className="mr-2 h-5 w-5" />
                         Client Info
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-3">
                         <Label htmlFor="name">Client Name *</Label>
                         <Input
                           id="name"
@@ -202,9 +202,10 @@ export default function NewClientPage() {
                           value={formData.name}
                           onChange={(e) => handleChange('name', e.target.value)}
                           placeholder="Enter client name"
+                          className="h-11 rounded-xl"
                         />
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="email">Primary Contact Email *</Label>
                         <Input
                           id="email"
@@ -213,24 +214,27 @@ export default function NewClientPage() {
                           value={formData.email}
                           onChange={(e) => handleChange('email', e.target.value)}
                           placeholder="Enter email address"
+                          className="h-11 rounded-xl"
                         />
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="company">Company / Brand</Label>
                         <Input
                           id="company"
                           value={formData.company}
                           onChange={(e) => handleChange('company', e.target.value)}
                           placeholder="Enter company or brand name"
+                          className="h-11 rounded-xl"
                         />
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="primary_contact">Primary Point of Contact</Label>
                         <Input
                           id="primary_contact"
                           value={formData.primary_contact}
                           onChange={(e) => handleChange('primary_contact', e.target.value)}
                           placeholder="Enter primary contact name"
+                          className="h-11 rounded-xl"
                         />
                       </div>
                     </CardContent>
@@ -238,27 +242,33 @@ export default function NewClientPage() {
 
                   {/* Socials & Stats Panel */}
                   <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
-                    <CardHeader className="pb-3">
+                    <CardHeader className="pb-4 pt-5">
                       <CardTitle className="text-lg flex items-center">
                         <IconLink className="mr-2 h-5 w-5" />
                         Socials & Stats
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-3">
                         <Label htmlFor="youtube" className="flex items-center">
                           <IconBrandYoutube className="mr-2 h-5 w-5 text-red-600" />
                           YouTube Channel Link
                         </Label>
-                        <Input
-                          id="youtube"
-                          value={formData.youtube}
-                          onChange={(e) => handleChange('youtube', e.target.value)}
-                          placeholder="https://youtube.com/channel/..."
-                        />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <IconBrandYoutube className="h-5 w-5 text-red-600" />
+                          </div>
+                          <Input
+                            id="youtube"
+                            value={formData.youtube}
+                            onChange={(e) => handleChange('youtube', e.target.value)}
+                            placeholder="https://youtube.com/channel/..."
+                            className="h-11 rounded-xl pl-10"
+                          />
+                        </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
+                        <div className="space-y-3">
                           <Label htmlFor="subscriber_count">Subscriber Count</Label>
                           <Input
                             id="subscriber_count"
@@ -266,68 +276,99 @@ export default function NewClientPage() {
                             value={formData.subscriber_count}
                             onChange={(e) => handleChange('subscriber_count', e.target.value)}
                             placeholder="e.g., 53200"
+                            className="h-11 rounded-xl"
                           />
                         </div>
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="instagram" className="flex items-center">
                           <IconBrandInstagram className="mr-2 h-5 w-5 text-pink-500" />
                           Instagram Link
                         </Label>
-                        <Input
-                          id="instagram"
-                          value={formData.instagram}
-                          onChange={(e) => handleChange('instagram', e.target.value)}
-                          placeholder="https://instagram.com/..."
-                        />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <IconBrandInstagram className="h-5 w-5 text-pink-500" />
+                          </div>
+                          <Input
+                            id="instagram"
+                            value={formData.instagram}
+                            onChange={(e) => handleChange('instagram', e.target.value)}
+                            placeholder="https://instagram.com/..."
+                            className="h-11 rounded-xl pl-10"
+                          />
+                        </div>
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="twitter" className="flex items-center">
                           <IconBrandTwitter className="mr-2 h-5 w-5 text-blue-400" />
                           Twitter Link
                         </Label>
-                        <Input
-                          id="twitter"
-                          value={formData.twitter}
-                          onChange={(e) => handleChange('twitter', e.target.value)}
-                          placeholder="https://twitter.com/..."
-                        />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <IconBrandTwitter className="h-5 w-5 text-blue-400" />
+                          </div>
+                          <Input
+                            id="twitter"
+                            value={formData.twitter}
+                            onChange={(e) => handleChange('twitter', e.target.value)}
+                            placeholder="https://twitter.com/..."
+                            className="h-11 rounded-xl pl-10"
+                          />
+                        </div>
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="tiktok" className="flex items-center">
                           <IconBrandTiktok className="mr-2 h-5 w-5" />
                           TikTok Link
                         </Label>
-                        <Input
-                          id="tiktok"
-                          value={formData.tiktok}
-                          onChange={(e) => handleChange('tiktok', e.target.value)}
-                          placeholder="https://tiktok.com/..."
-                        />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <IconBrandTiktok className="h-5 w-5" />
+                          </div>
+                          <Input
+                            id="tiktok"
+                            value={formData.tiktok}
+                            onChange={(e) => handleChange('tiktok', e.target.value)}
+                            placeholder="https://tiktok.com/..."
+                            className="h-11 rounded-xl pl-10"
+                          />
+                        </div>
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="linkedin" className="flex items-center">
                           <IconBrandLinkedin className="mr-2 h-5 w-5 text-blue-600" />
                           LinkedIn Link
                         </Label>
-                        <Input
-                          id="linkedin"
-                          value={formData.linkedin}
-                          onChange={(e) => handleChange('linkedin', e.target.value)}
-                          placeholder="https://linkedin.com/..."
-                        />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <IconBrandLinkedin className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <Input
+                            id="linkedin"
+                            value={formData.linkedin}
+                            onChange={(e) => handleChange('linkedin', e.target.value)}
+                            placeholder="https://linkedin.com/..."
+                            className="h-11 rounded-xl pl-10"
+                          />
+                        </div>
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="drive_link" className="flex items-center">
                           <IconCloudUpload className="mr-2 h-5 w-5" />
                           Value Link (Drive / Loom)
                         </Label>
-                        <Input
-                          id="drive_link"
-                          value={formData.drive_link}
-                          onChange={(e) => handleChange('drive_link', e.target.value)}
-                          placeholder="https://drive.google.com/... or https://loom.com/..."
-                        />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <IconCloudUpload className="h-5 w-5" />
+                          </div>
+                          <Input
+                            id="drive_link"
+                            value={formData.drive_link}
+                            onChange={(e) => handleChange('drive_link', e.target.value)}
+                            placeholder="https://drive.google.com/... or https://loom.com/..."
+                            className="h-11 rounded-xl pl-10"
+                          />
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -337,20 +378,20 @@ export default function NewClientPage() {
                 <div className="space-y-6">
                   {/* Outreach Details Panel */}
                   <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
-                    <CardHeader className="pb-3">
+                    <CardHeader className="pb-4 pt-5">
                       <CardTitle className="text-lg flex items-center">
                         <IconMail className="mr-2 h-5 w-5" />
                         Outreach Details
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-3">
                         <Label htmlFor="outreach_type">Outreach Type</Label>
                         <Select
                           value={formData.outreach_type}
                           onValueChange={(value) => handleChange('outreach_type', value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="h-11 rounded-xl">
                             <SelectValue placeholder="Select outreach type" />
                           </SelectTrigger>
                           <SelectContent>
@@ -360,13 +401,13 @@ export default function NewClientPage() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="outreach_platform">Outreach Platform</Label>
                         <Select
                           value={formData.outreach_platform}
                           onValueChange={(value) => handleChange('outreach_platform', value)}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="h-11 rounded-xl">
                             <SelectValue placeholder="Select platform" />
                           </SelectTrigger>
                           <SelectContent>
@@ -378,32 +419,35 @@ export default function NewClientPage() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="outreach_date">Outreach Date</Label>
                         <Input
                           id="outreach_date"
                           type="date"
                           value={formData.outreach_date}
                           onChange={(e) => handleChange('outreach_date', e.target.value)}
+                          className="h-11 rounded-xl"
                         />
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="outreach_link_sent">Outreach Link Sent</Label>
                         <Input
                           id="outreach_link_sent"
                           value={formData.outreach_link_sent}
                           onChange={(e) => handleChange('outreach_link_sent', e.target.value)}
                           placeholder="https://your-special-page.com/..."
+                          className="h-11 rounded-xl"
                         />
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="outreach_notes">Outreach Notes</Label>
                         <Textarea
                           id="outreach_notes"
                           value={formData.outreach_notes}
                           onChange={(e) => handleChange('outreach_notes', e.target.value)}
                           placeholder="Brief note about what was sent"
-                          rows={3}
+                          rows={4}
+                          className="rounded-xl"
                         />
                       </div>
                     </CardContent>
@@ -411,7 +455,7 @@ export default function NewClientPage() {
 
                   {/* Follow-up Tracking Panel */}
                   <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
-                    <CardHeader className="pb-3">
+                    <CardHeader className="pb-4 pt-5">
                       <CardTitle className="text-lg flex items-center justify-between">
                         <span className="flex items-center">
                           <IconCalendar className="mr-2 h-5 w-5" />
@@ -431,15 +475,15 @@ export default function NewClientPage() {
                         </div>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-6">
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
+                        <div className="space-y-3">
                           <Label htmlFor="lead_temp">Lead Temperature</Label>
                           <Select
                             value={formData.lead_temp}
                             onValueChange={(value) => handleChange('lead_temp', value as Client['lead_temp'])}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger className="h-11 rounded-xl">
                               <SelectValue placeholder="Select temperature" />
                             </SelectTrigger>
                             <SelectContent>
@@ -449,13 +493,13 @@ export default function NewClientPage() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div>
+                        <div className="space-y-3">
                           <Label htmlFor="did_reply">Did they reply?</Label>
                           <Select
                             value={formData.did_reply}
                             onValueChange={(value) => handleChange('did_reply', value)}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger className="h-11 rounded-xl">
                               <SelectValue placeholder="Select reply status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -468,13 +512,13 @@ export default function NewClientPage() {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
+                        <div className="space-y-3">
                           <Label htmlFor="follow_up_status">Follow-up Status</Label>
                           <Select
                             value={formData.follow_up_status}
                             onValueChange={(value) => handleChange('follow_up_status', value)}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger className="h-11 rounded-xl">
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -484,7 +528,7 @@ export default function NewClientPage() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div>
+                        <div className="space-y-3">
                           <Label htmlFor="follow_up_count">Follow-up Count</Label>
                           <div className="flex items-center">
                             <Button 
@@ -493,10 +537,11 @@ export default function NewClientPage() {
                               size="icon" 
                               onClick={decrementFollowUpCount}
                               disabled={formData.follow_up_count <= 0}
+                              className="h-9 w-9 rounded-lg"
                             >
                               <IconMinus className="h-4 w-4" />
                             </Button>
-                            <div className="mx-2 w-12 text-center">
+                            <div className="mx-3 w-10 text-center">
                               {formData.follow_up_count}
                             </div>
                             <Button 
@@ -504,37 +549,41 @@ export default function NewClientPage() {
                               variant="outline" 
                               size="icon" 
                               onClick={incrementFollowUpCount}
+                              className="h-9 w-9 rounded-lg"
                             >
                               <IconPlus className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="platforms_followed_up_on">Platforms Followed Up On</Label>
                         <Input
                           id="platforms_followed_up_on"
                           value={formData.platforms_followed_up_on}
                           onChange={(e) => handleChange('platforms_followed_up_on', e.target.value)}
                           placeholder="e.g., Email, Twitter, IG"
+                          className="h-11 rounded-xl"
                         />
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="next_follow_up_date">Next Follow-up Date</Label>
                         <Input
                           id="next_follow_up_date"
                           type="date"
                           value={formData.next_follow_up_date}
                           onChange={(e) => handleChange('next_follow_up_date', e.target.value)}
+                          className="h-11 rounded-xl"
                         />
                       </div>
-                      <div>
+                      <div className="space-y-3">
                         <Label htmlFor="first_outreach_date">First Outreach Date</Label>
                         <Input
                           id="first_outreach_date"
                           type="date"
                           value={formData.first_outreach_date}
                           onChange={(e) => handleChange('first_outreach_date', e.target.value)}
+                          className="h-11 rounded-xl"
                         />
                       </div>
                     </CardContent>
@@ -545,7 +594,7 @@ export default function NewClientPage() {
               {/* Notes Panel (Collapsible) */}
               <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
                 <CardHeader 
-                  className="pb-3 cursor-pointer flex flex-row items-center justify-between"
+                  className="pb-4 pt-5 cursor-pointer flex flex-row items-center justify-between"
                   onClick={() => toggleSection('notes')}
                 >
                   <CardTitle className="text-lg flex items-center">
@@ -557,26 +606,28 @@ export default function NewClientPage() {
                   />
                 </CardHeader>
                 {expandedSections.notes && (
-                  <CardContent className="space-y-4">
-                    <div>
+                  <CardContent className="space-y-6 pb-5">
+                    <div className="space-y-3">
                       <Label htmlFor="source">Source</Label>
                       <Input
                         id="source"
                         value={formData.source}
                         onChange={(e) => handleChange('source', e.target.value)}
                         placeholder="How were they found?"
+                        className="h-11 rounded-xl"
                       />
                     </div>
-                    <div>
+                    <div className="space-y-3">
                       <Label htmlFor="tags">Tags</Label>
                       <Input
                         id="tags"
                         value={formData.tags}
                         onChange={(e) => handleChange('tags', e.target.value)}
                         placeholder="e.g., priority, niche"
+                        className="h-11 rounded-xl"
                       />
                     </div>
-                    <div>
+                    <div className="space-y-3">
                       <Label htmlFor="notes">Notes / Research</Label>
                       <Textarea
                         id="notes"
@@ -584,6 +635,7 @@ export default function NewClientPage() {
                         onChange={(e) => handleChange('notes', e.target.value)}
                         placeholder="Paste research, email drafts, and other notes here..."
                         rows={6}
+                        className="rounded-xl"
                       />
                     </div>
                   </CardContent>
@@ -591,16 +643,21 @@ export default function NewClientPage() {
               </Card>
 
               {/* Action Buttons */}
-              <div className="flex justify-end space-x-2">
+              <div className="flex justify-end space-x-3 pt-2">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => router.back()}
                   disabled={saving}
+                  className="h-11 px-5 rounded-xl"
                 >
                   Cancel
                 </Button>
-                <RainbowButton type="submit" disabled={saving}>
+                <RainbowButton 
+                  type="submit" 
+                  disabled={saving}
+                  className="h-11 px-5 rounded-xl"
+                >
                   {saving ? 'Creating...' : 'Create Client'}
                 </RainbowButton>
               </div>

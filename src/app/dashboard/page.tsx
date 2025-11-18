@@ -43,6 +43,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Client } from '@/lib/types'
+import { getClients } from '@/lib/supabase/db'
 
 // Mock data for the charts
 const chartData = [
@@ -61,32 +63,17 @@ const chartData = [
 ]
 
 const revenueData = [
-  { name: 'Retainers', value: 45000, color: 'hsl(var(--chart-1))' },
-  { name: 'One-off Projects', value: 32000, color: 'hsl(var(--chart-2))' },
-  { name: 'Ad Spend Management', value: 18000, color: 'hsl(var(--chart-3))' },
-  { name: 'Consulting', value: 12000, color: 'hsl(var(--chart-4))' },
-  { name: 'Other', value: 5000, color: 'hsl(var(--chart-5))' },
-]
-
-const projectData = [
-  { id: 1, title: 'Brand Identity Redesign', client: 'Acme Corp', dueDate: '2025-11-25', email: 'contact@acme.com' },
-  { id: 2, title: 'Social Media Campaign', client: 'Global Tech', dueDate: '2025-11-30', email: 'info@globaltech.com' },
-  { id: 3, title: 'Product Video Series', client: 'Innovate Inc', dueDate: '2025-12-05', email: 'hello@innovate.com' },
-  { id: 4, title: 'Website Redesign', client: 'Future Solutions', dueDate: '2025-12-10', email: 'support@futuresol.com' },
-]
-
-// Updated KPI data with all requested metrics
-const kpiData = [
-  { title: 'Total Clients', value: '24', change: '+2 from last month', icon: <Users className="h-5 w-5" /> },
-  { title: 'New Clients', value: '4', change: '+1 from last month', icon: <UserPlus className="h-5 w-5" /> },
-  { title: 'Revenue', value: '$12,400', change: '+15% from last month', icon: <DollarSign className="h-5 w-5" /> },
-  { title: 'Outreaches Done', value: '18', change: '+3 from last week', icon: <Send className="h-5 w-5" /> },
-  { title: 'Follow Ups Pending', value: '7', change: '-2 from last week', icon: <Clock className="h-5 w-5" /> },
+  { name: 'Retainers', value: 45000, color: '#ec4899' },
+  { name: 'One-off Projects', value: 32000, color: '#f97316' },
+  { name: 'Ad Spend Management', value: 18000, color: '#8b5cf6' },
+  { name: 'Consulting', value: 12000, color: '#0ea5e9' },
+  { name: 'Other', value: 5000, color: '#10b981' },
 ]
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [isMounted, setIsMounted] = useState(false)
+  const [clients, setClients] = useState<Client[]>([])
   const router = useRouter()
 
   useEffect(() => {
@@ -106,7 +93,17 @@ export default function DashboardPage() {
       }
     }
 
+    const fetchClients = async () => {
+      try {
+        const clientData = await getClients()
+        setClients(clientData)
+      } catch (error) {
+        console.error('Error fetching clients:', error)
+      }
+    }
+
     checkAuth()
+    fetchClients()
   }, [router])
 
   if (!isMounted) {
@@ -140,38 +137,41 @@ export default function DashboardPage() {
     )
   }
 
+  // Get latest 3 clients for the dashboard
+  const latestClients = clients.slice(0, 3)
+
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="flex flex-col h-[calc(100vh-64px)]">
         {/* Hero Section - stacked vertically and left-aligned */}
-        <div className="space-y-4">
+        <div className="flex-shrink-0">
           <TypingAnimation 
-            className="text-4xl font-bold"
+            className="text-3xl font-bold"
           >
             GodCRM
           </TypingAnimation>
-          <AnimatedShinyText className="text-xl">
+          <AnimatedShinyText className="text-sm text-muted-foreground mt-1">
             Your creative agency management solution
           </AnimatedShinyText>
         </div>
 
         {/* KPI Cards - updated to 5 cards with glassmorphism */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 my-4 flex-shrink-0">
           {kpiData.map((kpi, index) => (
-            <Card key={index} className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-coral-500 to-pink-500"></div>
-              <CardHeader className="pb-2">
+            <Card key={index} className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 to-purple-500"></div>
+              <CardHeader className="pb-2 pt-3">
                 <div className="flex items-center">
                   <div className="mr-2 text-primary">
                     {kpi.icon}
                   </div>
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                  <CardTitle className="text-xs font-medium text-muted-foreground">
                     {kpi.title}
                   </CardTitle>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{kpi.value}</div>
+              <CardContent className="pb-3">
+                <div className="text-xl font-bold">{kpi.value}</div>
                 <p className="text-xs text-muted-foreground mt-1">{kpi.change}</p>
               </CardContent>
             </Card>
@@ -179,50 +179,58 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content - Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 flex-grow min-h-0">
           {/* Left Column - Larger */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-3 flex flex-col">
             {/* Agency Revenue Trend Chart */}
-            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">
+            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-shrink-0">
+              <CardHeader className="pb-2 pt-3">
+                <CardTitle className="text-base font-semibold">
                   Agency Revenue Trend
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="h-[520px]">
+              <CardContent className="pb-3">
+                <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground)/0.2)" />
-                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
-                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--primary)/0.2)" />
+                      <XAxis 
+                        dataKey="name" 
+                        stroke="#ec4899" 
+                        tick={{ fill: '#ec4899', fontSize: 10 }}
+                      />
+                      <YAxis 
+                        stroke="#ec4899" 
+                        tick={{ fill: '#ec4899', fontSize: 10 }}
+                      />
                       <Tooltip 
                         contentStyle={{ 
                           backgroundColor: 'hsl(var(--background)/0.8)', 
                           backdropFilter: 'blur(10px)',
                           border: '1px solid hsl(var(--border))',
-                          borderRadius: 'var(--radius)'
+                          borderRadius: 'var(--radius)',
+                          color: 'hsl(var(--foreground))'
                         }} 
                       />
                       <Area 
                         type="monotone" 
                         dataKey="revenue" 
-                        stroke="hsl(var(--primary))" 
+                        stroke="#ec4899" 
                         fill="url(#colorRevenue)" 
                         fillOpacity={0.3}
                       />
                       <Line 
                         type="monotone" 
                         dataKey="revenue" 
-                        stroke="hsl(var(--primary))" 
+                        stroke="#ec4899" 
                         strokeWidth={2}
-                        dot={{ r: 4, fill: 'hsl(var(--primary))' }}
-                        activeDot={{ r: 6, fill: 'hsl(var(--primary))' }}
+                        dot={{ r: 4, fill: '#ec4899', stroke: '#fff', strokeWidth: 2 }}
+                        activeDot={{ r: 6, fill: '#ec4899', stroke: '#fff', strokeWidth: 2 }}
                       />
                       <defs>
                         <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                          <stop offset="5%" stopColor="#ec4899" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#ec4899" stopOpacity={0.1}/>
                         </linearGradient>
                       </defs>
                     </AreaChart>
@@ -232,74 +240,83 @@ export default function DashboardPage() {
             </Card>
 
             {/* Latest Projects List */}
-            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">
-                  Latest Projects
+            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-grow flex flex-col">
+              <CardHeader className="pb-2 pt-3 flex-shrink-0">
+                <CardTitle className="text-base font-semibold">
+                  Latest Clients
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {projectData.map((project) => (
-                    <div key={project.id} className="flex items-center p-4 rounded-xl bg-background/20 hover:bg-background/30 transition-all duration-200 border border-white/5">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mr-4">
-                        <TrendingUp className="h-6 w-6 text-primary" />
+              <CardContent className="pb-3 flex-grow flex flex-col">
+                <div className="flex-grow overflow-y-auto custom-scrollbar">
+                  <div className="space-y-2">
+                    {latestClients.map((client) => (
+                      <div key={client.id} className="flex items-center p-2 rounded-lg bg-background/20 hover:bg-background/30 transition-all duration-200 border border-white/5">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mr-2">
+                          <TrendingUp className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="flex-grow">
+                          <h4 className="font-medium text-xs">{client.name}</h4>
+                          <p className="text-xs text-muted-foreground">{client.company || 'No company'}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs">{client.email}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {client.created_at ? new Date(client.created_at).toLocaleDateString() : ''}
+                          </p>
+                        </div>
+                        <div className="ml-2 text-muted-foreground">
+                          <ChevronRight className="h-3 w-3" />
+                        </div>
                       </div>
-                      <div className="flex-grow">
-                        <h4 className="font-medium">{project.title}</h4>
-                        <p className="text-sm text-muted-foreground">{project.client}</p>
+                    ))}
+                    {latestClients.length === 0 && (
+                      <div className="text-center py-4 text-muted-foreground">
+                        No clients found
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm">{project.dueDate}</p>
-                        <p className="text-xs text-muted-foreground">{project.email}</p>
-                      </div>
-                      <div className="ml-4 text-muted-foreground">
-                        <ChevronRight className="h-5 w-5" />
-                      </div>
-                    </div>
-                  ))}
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Right Column - Narrower */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-3 flex flex-col">
             {/* Revenue Breakdown Donut Chart */}
-            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg">
-              <CardHeader>
+            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-grow flex flex-col">
+              <CardHeader className="pb-2 pt-3 flex-shrink-0">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-lg font-semibold">
+                  <CardTitle className="text-base font-semibold">
                     Revenue Breakdown
                   </CardTitle>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-1">
                     <Select>
-                      <SelectTrigger className="w-[120px] h-8 text-xs">
-                        <SelectValue placeholder="Last 30 days" />
+                      <SelectTrigger className="w-[80px] h-7 text-xs">
+                        <SelectValue placeholder="30d" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="7">Last 7 days</SelectItem>
-                        <SelectItem value="30">Last 30 days</SelectItem>
-                        <SelectItem value="90">Last 90 days</SelectItem>
+                        <SelectItem value="7">7d</SelectItem>
+                        <SelectItem value="30">30d</SelectItem>
+                        <SelectItem value="90">90d</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Button variant="outline" size="sm" className="h-8 text-xs">
-                      See Details
+                    <Button variant="outline" size="sm" className="h-7 text-xs px-2">
+                      Details
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pb-3 flex-grow flex flex-col justify-center">
                 <div className="flex flex-col items-center">
-                  <div className="relative w-48 h-48">
+                  <div className="relative w-32 h-32">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
                           data={revenueData}
                           cx="50%"
                           cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
+                          innerRadius={40}
+                          outerRadius={55}
                           paddingAngle={2}
                           dataKey="value"
                           stroke="hsl(var(--background))"
@@ -314,25 +331,26 @@ export default function DashboardPage() {
                             backgroundColor: 'hsl(var(--background)/0.8)', 
                             backdropFilter: 'blur(10px)',
                             border: '1px solid hsl(var(--border))',
-                            borderRadius: 'var(--radius)'
+                            borderRadius: 'var(--radius)',
+                            color: 'hsl(var(--foreground))'
                           }} 
                         />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-2xl font-bold">72%</span>
-                      <span className="text-xs text-muted-foreground text-center">Improved from last month</span>
+                      <div className="text-xl font-bold text-primary drop-shadow-[0_0_4px_rgba(147,51,234,0.5)]">72%</div>
+                      <span className="text-xs text-muted-foreground text-center mt-0.5">+12%</span>
                     </div>
                   </div>
-                  <div className="mt-4 grid grid-cols-1 gap-2 w-full">
+                  <div className="mt-2 grid grid-cols-1 gap-1 w-full">
                     {revenueData.map((item, index) => (
                       <div key={index} className="flex items-center">
                         <div 
-                          className="w-3 h-3 rounded-full mr-2" 
+                          className="w-2 h-2 rounded-full mr-1.5" 
                           style={{ backgroundColor: item.color }}
                         ></div>
-                        <span className="text-sm flex-grow">{item.name}</span>
-                        <span className="text-sm font-medium">${item.value.toLocaleString()}</span>
+                        <span className="text-xs flex-grow truncate">{item.name}</span>
+                        <span className="text-xs font-medium">${(item.value/1000).toFixed(0)}k</span>
                       </div>
                     ))}
                   </div>
@@ -343,15 +361,43 @@ export default function DashboardPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap gap-4">
-          <RainbowButton onClick={() => router.push('/clients')}>
+        <div className="flex flex-wrap gap-2 pt-4 flex-shrink-0">
+          <RainbowButton onClick={() => router.push('/clients')} className="h-9 px-3 text-sm">
             Manage Clients
           </RainbowButton>
-          <RainbowButton onClick={() => router.push('/assets')}>
+          <RainbowButton onClick={() => router.push('/assets')} className="h-9 px-3 text-sm">
             View Assets
           </RainbowButton>
         </div>
       </div>
+
+      {/* Custom scrollbar styles */}
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #ec4899, #8b5cf6);
+          border-radius: 10px;
+          box-shadow: 0 0 4px rgba(147, 51, 234, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #f97316, #ec4899);
+        }
+      `}</style>
     </DashboardLayout>
   )
 }
+
+// Updated KPI data with all requested metrics
+const kpiData = [
+  { title: 'Total Clients', value: '24', change: '+2 from last month', icon: <Users className="h-5 w-5" /> },
+  { title: 'New Clients', value: '4', change: '+1 from last month', icon: <UserPlus className="h-5 w-5" /> },
+  { title: 'Revenue', value: '$12,400', change: '+15% from last month', icon: <DollarSign className="h-5 w-5" /> },
+  { title: 'Outreaches Done', value: '18', change: '+3 from last week', icon: <Send className="h-5 w-5" /> },
+  { title: 'Follow Ups Pending', value: '7', change: '-2 from last week', icon: <Clock className="h-5 w-5" /> },
+]
