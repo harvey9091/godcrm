@@ -24,23 +24,48 @@ import {
   IconTrash, 
   IconBrandYoutube, 
   IconBrandInstagram, 
+  IconBrandTwitter,
   IconBrandLinkedin, 
-  IconBrandTiktok 
+  IconBrandTiktok,
+  IconDots,
+  IconMail,
+  IconSearch,
+  IconFilter
 } from '@tabler/icons-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export default function ClientsPage() {
   const [loading, setLoading] = useState(true)
   const [clients, setClients] = useState<Client[]>([])
+  const [filteredClients, setFilteredClients] = useState<Client[]>([])
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [selectedClients, setSelectedClients] = useState<string[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [leadTempFilter, setLeadTempFilter] = useState<string>('all')
+  const [followUpStatusFilter, setFollowUpStatusFilter] = useState<string>('all')
+  const [outreachTypeFilter, setOutreachTypeFilter] = useState<string>('all')
   const router = useRouter()
 
   const fetchClients = useCallback(async () => {
     try {
       const data = await getClients()
       setClients(data)
+      setFilteredClients(data)
     } catch (error) {
       console.error('Error fetching clients:', error)
-      // Show user-friendly error message
     } finally {
       setLoading(false)
     }
@@ -64,6 +89,37 @@ export default function ClientsPage() {
     checkAuth()
   }, [router, fetchClients])
 
+  // Filter clients based on search and filters
+  useEffect(() => {
+    let result = [...clients]
+    
+    // Apply search filter
+    if (searchTerm) {
+      result = result.filter(client => 
+        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (client.company && client.company.toLowerCase().includes(searchTerm.toLowerCase()))
+      )
+    }
+    
+    // Apply lead temperature filter
+    if (leadTempFilter !== 'all') {
+      result = result.filter(client => client.lead_temp === leadTempFilter)
+    }
+    
+    // Apply follow-up status filter
+    if (followUpStatusFilter !== 'all' && followUpStatusFilter) {
+      result = result.filter(client => client.follow_up_status === followUpStatusFilter)
+    }
+    
+    // Apply outreach type filter
+    if (outreachTypeFilter !== 'all' && outreachTypeFilter) {
+      result = result.filter(client => client.outreach_type === outreachTypeFilter)
+    }
+    
+    setFilteredClients(result)
+  }, [searchTerm, leadTempFilter, followUpStatusFilter, outreachTypeFilter, clients])
+
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this client?')) return
     
@@ -73,7 +129,6 @@ export default function ClientsPage() {
       await fetchClients() // Refresh the client list
     } catch (error) {
       console.error('Error deleting client:', error)
-      // Show user-friendly error message
     } finally {
       setDeletingId(null)
     }
@@ -98,12 +153,65 @@ export default function ClientsPage() {
     }
   }
 
+  const getFollowUpStatusColor = (status: string | undefined | null) => {
+    if (!status) return 'bg-gray-500'
+    switch (status) {
+      case 'Completed': return 'bg-green-500'
+      case 'In Progress': return 'bg-yellow-500'
+      case 'Not Started': return 'bg-gray-500'
+      default: return 'bg-gray-500'
+    }
+  }
+
   const isRecent = (date: string) => {
     const createdDate = new Date(date)
-    const thirtyDaysAgo = new Date()
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-    return createdDate > thirtyDaysAgo
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+    return createdDate > sevenDaysAgo
   }
+
+  const formatSubscriberCount = (count: number | undefined | null) => {
+    if (!count) return ''
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`
+    return count.toString()
+  }
+
+  const toggleClientSelection = (id: string) => {
+    setSelectedClients(prev => 
+      prev.includes(id) 
+        ? prev.filter(clientId => clientId !== id) 
+        : [...prev, id]
+    )
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedClients.length === filteredClients.length) {
+      setSelectedClients([])
+    } else {
+      setSelectedClients(filteredClients.map(client => client.id))
+    }
+  }
+
+  const clearFilters = () => {
+    setSearchTerm('')
+    setLeadTempFilter('all')
+    setFollowUpStatusFilter('all')
+    setOutreachTypeFilter('all')
+  }
+
+  // Calculate KPIs
+  const totalClients = clients.length
+  const outreachesToday = clients.filter(client => 
+    client.outreach_date && 
+    new Date(client.outreach_date).toDateString() === new Date().toDateString()
+  ).length
+  const outreachesRemaining = Math.max(0, 3 - outreachesToday)
+  const followUpsPending = clients.filter(client => 
+    client.follow_up_status === 'Not Started' || 
+    client.follow_up_status === 'In Progress'
+  ).length
+  const newLeads = clients.filter(client => isRecent(client.created_at)).length
 
   if (loading) {
     return (
@@ -133,102 +241,334 @@ export default function ClientsPage() {
           </RainbowButton>
         </div>
 
-        <Card>
+        {/* KPI Row */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <Card 
+            className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+            onClick={() => {}}
+          >
+            <CardContent className="p-4">
+              <div className="text-sm text-muted-foreground">Total Clients</div>
+              <div className="text-2xl font-bold">{totalClients}</div>
+            </CardContent>
+          </Card>
+          <Card 
+            className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+            onClick={() => {}}
+          >
+            <CardContent className="p-4">
+              <div className="text-sm text-muted-foreground">Outreaches Today</div>
+              <div className="text-2xl font-bold">{outreachesToday}</div>
+            </CardContent>
+          </Card>
+          <Card 
+            className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+            onClick={() => {}}
+          >
+            <CardContent className="p-4">
+              <div className="text-sm text-muted-foreground">Outreaches Remaining</div>
+              <div className="text-2xl font-bold">{outreachesRemaining} / 3</div>
+              <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                <div 
+                  className="bg-primary h-1.5 rounded-full" 
+                  style={{ width: `${(outreachesToday / 3) * 100}%` }}
+                ></div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card 
+            className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+            onClick={() => {
+              setFollowUpStatusFilter('Not Started')
+            }}
+          >
+            <CardContent className="p-4">
+              <div className="text-sm text-muted-foreground">Follow-ups Pending</div>
+              <div className="text-2xl font-bold">{followUpsPending}</div>
+            </CardContent>
+          </Card>
+          <Card 
+            className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+            onClick={() => {
+              // Filter by recent clients
+              const sevenDaysAgo = new Date()
+              sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+              // This would require a more complex filter implementation
+            }}
+          >
+            <CardContent className="p-4">
+              <div className="text-sm text-muted-foreground">New Leads</div>
+              <div className="text-2xl font-bold">{newLeads}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters */}
+        <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg">
+          <CardContent className="p-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  placeholder="Search clients..."
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <Select value={leadTempFilter} onValueChange={setLeadTempFilter}>
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue placeholder="Lead Temp" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Leads</SelectItem>
+                    <SelectItem value="hot">Hot</SelectItem>
+                    <SelectItem value="warm">Warm</SelectItem>
+                    <SelectItem value="cold">Cold</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={followUpStatusFilter} onValueChange={setFollowUpStatusFilter}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Follow-up Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="Not Started">Not Started</SelectItem>
+                    <SelectItem value="In Progress">In Progress</SelectItem>
+                    <SelectItem value="Completed">Completed</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={outreachTypeFilter} onValueChange={setOutreachTypeFilter}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Outreach Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="Cold Email">Cold Email</SelectItem>
+                    <SelectItem value="Reedit">Reedit</SelectItem>
+                    <SelectItem value="YT Jobs">YT Jobs</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Bulk Actions Toolbar */}
+        {selectedClients.length > 0 && (
+          <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  {selectedClients.length} client{selectedClients.length !== 1 ? 's' : ''} selected
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    Send Bulk Email
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Mark Follow-up Complete
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Assign Tag
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Export CSV
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Clients Table */}
+        <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg">
           <CardHeader>
             <CardTitle>All Clients</CardTitle>
           </CardHeader>
           <CardContent>
-            {clients.length === 0 ? (
+            {filteredClients.length === 0 ? (
               <div className="text-center py-10">
                 <p className="text-gray-500">No clients found. Add your first client!</p>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Lead Temp</TableHead>
-                    <TableHead>Socials</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {clients.map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell className="font-medium">{client.name}</TableCell>
-                      <TableCell>{client.email}</TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(client.status)}>
-                          {client.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getLeadTempColor(client.lead_temp)}>
-                          {client.lead_temp}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          {client.youtube && (
-                            <a href={client.youtube} target="_blank" rel="noopener noreferrer">
-                              <IconBrandYoutube className="w-5 h-5 text-red-600" />
-                            </a>
-                          )}
-                          {client.instagram && (
-                            <a href={client.instagram} target="_blank" rel="noopener noreferrer">
-                              <IconBrandInstagram className="w-5 h-5 text-pink-500" />
-                            </a>
-                          )}
-                          {client.linkedin && (
-                            <a href={client.linkedin} target="_blank" rel="noopener noreferrer">
-                              <IconBrandLinkedin className="w-5 h-5 text-blue-600" />
-                            </a>
-                          )}
-                          {client.tiktok && (
-                            <a href={client.tiktok} target="_blank" rel="noopener noreferrer">
-                              <IconBrandTiktok className="w-5 h-5 text-black" />
-                            </a>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(client.created_at).toLocaleDateString()}
-                        {isRecent(client.created_at) && (
-                          <Badge variant="secondary" className="ml-2">
-                            Recent
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => router.push(`/clients/${client.id}`)}
-                          >
-                            <IconEdit className="w-4 h-4" />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleDelete(client.id)}
-                            disabled={deletingId === client.id}
-                          >
-                            {deletingId === client.id ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-                            ) : (
-                              <IconTrash className="w-4 h-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </TableCell>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">
+                        <input
+                          type="checkbox"
+                          checked={selectedClients.length === filteredClients.length && filteredClients.length > 0}
+                          onChange={toggleSelectAll}
+                        />
+                      </TableHead>
+                      <TableHead>Client</TableHead>
+                      <TableHead>Subscribers</TableHead>
+                      <TableHead>Socials</TableHead>
+                      <TableHead>Lead Temp</TableHead>
+                      <TableHead>Outreach</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Follow-up</TableHead>
+                      <TableHead>Count</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredClients.map((client) => (
+                      <TableRow 
+                        key={client.id} 
+                        className="hover:bg-card/50 transition-colors"
+                      >
+                        <TableCell>
+                          <input
+                            type="checkbox"
+                            checked={selectedClients.includes(client.id)}
+                            onChange={() => toggleClientSelection(client.id)}
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center">
+                            {client.name}
+                            {isRecent(client.created_at) && (
+                              <Badge variant="secondary" className="ml-2 bg-blue-500 text-white">
+                                New
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {client.subscriber_count ? formatSubscriberCount(client.subscriber_count) : ''}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            {client.youtube && (
+                              <a 
+                                href={client.youtube} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <IconBrandYoutube className="w-5 h-5" />
+                              </a>
+                            )}
+                            {client.twitter && (
+                              <a 
+                                href={client.twitter} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-400 hover:text-blue-500"
+                              >
+                                <IconBrandTwitter className="w-5 h-5" />
+                              </a>
+                            )}
+                            {client.instagram && (
+                              <a 
+                                href={client.instagram} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-pink-500 hover:text-pink-600"
+                              >
+                                <IconBrandInstagram className="w-5 h-5" />
+                              </a>
+                            )}
+                            {client.linkedin && (
+                              <a 
+                                href={client.linkedin} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-700"
+                              >
+                                <IconBrandLinkedin className="w-5 h-5" />
+                              </a>
+                            )}
+                            {client.tiktok && (
+                              <a 
+                                href={client.tiktok} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="hover:text-gray-700"
+                              >
+                                <IconBrandTiktok className="w-5 h-5" />
+                              </a>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getLeadTempColor(client.lead_temp)}>
+                            {client.lead_temp}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            {client.outreach_type}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            {client.outreach_date ? new Date(client.outreach_date).toLocaleDateString() : ''}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getFollowUpStatusColor(client.follow_up_status || undefined)}>
+                            {client.follow_up_status || 'N/A'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {client.follow_up_count}
+                        </TableCell>
+                        <TableCell>
+                          <a 
+                            href={`mailto:${client.email}`} 
+                            className="text-primary hover:underline"
+                          >
+                            <IconMail className="w-4 h-4 inline mr-1" />
+                            Email
+                          </a>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <IconDots className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => router.push(`/clients/${client.id}`)}>
+                                View
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => router.push(`/clients/${client.id}`)}>
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Add Note
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Send Link
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Archive
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDelete(client.id)}
+                                disabled={deletingId === client.id}
+                              >
+                                {deletingId === client.id ? 'Deleting...' : 'Delete'}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>

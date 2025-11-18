@@ -34,11 +34,11 @@ export const getClientById = async (id: string): Promise<Client | null> => {
   return data as Client
 }
 
-export const addClient = async (client: Omit<Client, 'id' | 'created_by' | 'created_at' | 'updated_at'>): Promise<Client> => {
+export const addClient = async (client: Omit<Client, 'id' | 'created_by' | 'created_at' | 'updated_at' | 'follow_up_count'>): Promise<Client> => {
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('clients')
-    .insert([{ ...client }])
+    .insert([{ ...client, follow_up_count: 0 }])
     .select()
     .single()
   
