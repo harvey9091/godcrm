@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { getSession } from '@/lib/supabase/auth'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { AnimatedGradientText } from '@/components/ui/animated-gradient-text'
-import { RainbowButton } from '@/components/ui/rainbow-button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { 
@@ -30,7 +29,8 @@ import {
   IconDots,
   IconMail,
   IconSearch,
-  IconFilter
+  IconFilter,
+  IconLink
 } from '@tabler/icons-react'
 import {
   DropdownMenu,
@@ -46,6 +46,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ClientDetailModal } from '@/components/client-detail-modal'
 
 export default function ClientsPage() {
   const [loading, setLoading] = useState(true)
@@ -57,15 +58,27 @@ export default function ClientsPage() {
   const [leadTempFilter, setLeadTempFilter] = useState<string>('all')
   const [followUpStatusFilter, setFollowUpStatusFilter] = useState<string>('all')
   const [outreachTypeFilter, setOutreachTypeFilter] = useState<string>('all')
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const router = useRouter()
 
   const fetchClients = useCallback(async () => {
     try {
       const data = await getClients()
-      setClients(data)
-      setFilteredClients(data)
+      setClients(data || [])
+      setFilteredClients(data || [])
     } catch (error) {
       console.error('Error fetching clients:', error)
+      // Check if it's an authentication error
+      if (error instanceof Error) {
+        if (error.message.includes('Unauthorized') || error.message.includes('401')) {
+          console.error('Authentication error - redirecting to login')
+          router.push('/login')
+        }
+      }
+      // Set empty arrays on error to prevent crashes
+      setClients([])
+      setFilteredClients([])
     } finally {
       setLoading(false)
     }
@@ -236,9 +249,12 @@ export default function ClientsPage() {
               Clients
             </AnimatedGradientText>
           </h1>
-          <RainbowButton onClick={() => router.push('/clients/new')}>
+          <button 
+            onClick={() => router.push('/clients/new')}
+            className="text-base text-violet-400 hover:text-violet-300 focus:outline-none focus:underline focus:underline-offset-2 focus:underline-violet-300 border-b border-violet-400/30 hover:border-violet-400 pb-1 transition-all"
+          >
             Add New Client
-          </RainbowButton>
+          </button>
         </div>
 
         {/* KPI Row */}
@@ -268,10 +284,10 @@ export default function ClientsPage() {
             <CardContent className="p-4">
               <div className="text-sm text-muted-foreground">Outreaches Remaining</div>
               <div className="text-2xl font-bold">{outreachesRemaining} / 3</div>
-              <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+              <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1 overflow-hidden">
                 <div 
-                  className="bg-primary h-1.5 rounded-full" 
-                  style={{ width: `${(outreachesToday / 3) * 100}%` }}
+                  className="bg-violet-500 h-1.5 rounded-full" 
+                  style={{ width: `${Math.min((outreachesToday / 3) * 100, 100)}%` }}
                 ></div>
               </div>
             </CardContent>
@@ -434,7 +450,15 @@ export default function ClientsPage() {
                         </TableCell>
                         <TableCell className="font-medium">
                           <div className="flex items-center">
-                            {client.name}
+                            <button 
+                              onClick={() => {
+                                setSelectedClient(client)
+                                setIsModalOpen(true)
+                              }}
+                              className="text-left hover:underline"
+                            >
+                              {client.name}
+                            </button>
                             {isRecent(client.created_at) && (
                               <Badge variant="secondary" className="ml-2 bg-blue-500 text-white">
                                 New
@@ -447,7 +471,19 @@ export default function ClientsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
-                            {client.youtube && (
+                            {client.website ? (
+                              <a 
+                                href={client.website} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-violet-500 hover:text-violet-600"
+                              >
+                                <IconLink className="w-5 h-5" />
+                              </a>
+                            ) : (
+                              <IconLink className="w-5 h-5 text-gray-400" />
+                            )}
+                            {client.youtube ? (
                               <a 
                                 href={client.youtube} 
                                 target="_blank" 
@@ -456,6 +492,8 @@ export default function ClientsPage() {
                               >
                                 <IconBrandYoutube className="w-5 h-5" />
                               </a>
+                            ) : (
+                              <IconBrandYoutube className="w-5 h-5 text-gray-400" />
                             )}
                             {client.twitter && (
                               <a 
@@ -523,13 +561,7 @@ export default function ClientsPage() {
                           {client.follow_up_count}
                         </TableCell>
                         <TableCell>
-                          <a 
-                            href={`mailto:${client.email}`} 
-                            className="text-primary hover:underline"
-                          >
-                            <IconMail className="w-4 h-4 inline mr-1" />
-                            Email
-                          </a>
+                          {client.email}
                         </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
@@ -573,6 +605,11 @@ export default function ClientsPage() {
           </CardContent>
         </Card>
       </div>
+      <ClientDetailModal 
+        client={selectedClient} 
+        open={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </DashboardLayout>
   )
 }

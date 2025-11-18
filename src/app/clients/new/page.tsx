@@ -69,6 +69,7 @@ export default function NewClientPage() {
     source: '',
     tags: '',
     notes: '',
+    website: '',
     status: 'active' as Client['status']
   })
   const [saving, setSaving] = useState(false)
@@ -144,12 +145,15 @@ export default function NewClientPage() {
         source: formData.source || null,
         tags: formData.tags || null,
         notes: formData.notes || null,
+        website: formData.website || null,
         status: formData.status
       })
       
       router.push('/clients')
     } catch (error) {
       console.error('Error creating client:', error)
+      // Show error message to user
+      alert(error instanceof Error ? error.message : 'Failed to create client. Please try again.')
       setSaving(false)
     }
   }
@@ -366,6 +370,24 @@ export default function NewClientPage() {
                             value={formData.drive_link}
                             onChange={(e) => handleChange('drive_link', e.target.value)}
                             placeholder="https://drive.google.com/... or https://loom.com/..."
+                            className="h-11 rounded-xl pl-10"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <Label htmlFor="website" className="flex items-center">
+                          <IconLink className="mr-2 h-5 w-5" />
+                          Website
+                        </Label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <IconLink className="h-5 w-5" />
+                          </div>
+                          <Input
+                            id="website"
+                            value={formData.website}
+                            onChange={(e) => handleChange('website', e.target.value)}
+                            placeholder="https://yourwebsite.com"
                             className="h-11 rounded-xl pl-10"
                           />
                         </div>

@@ -28,6 +28,7 @@ export type Client = {
   tags?: string | null
   notes?: string | null
   status: 'active' | 'ongoing' | 'closed' | 'dead'
+  website?: string | null
   created_at: string
   updated_at: string
 }

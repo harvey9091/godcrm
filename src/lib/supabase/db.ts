@@ -14,9 +14,13 @@ export const getClients = async (): Promise<Client[]> => {
   
   if (error) {
     console.error('Supabase error in getClients:', error)
+    // If it's a permission error, return empty array instead of throwing
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      return []
+    }
     throw error
   }
-  return data as Client[]
+  return data as Client[] || []
 }
 
 export const getClientById = async (id: string): Promise<Client | null> => {
@@ -29,6 +33,10 @@ export const getClientById = async (id: string): Promise<Client | null> => {
   
   if (error) {
     console.error('Supabase error in getClientById:', error)
+    // If it's a permission error, return null instead of throwing
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      return null
+    }
     throw error
   }
   return data as Client
@@ -36,14 +44,25 @@ export const getClientById = async (id: string): Promise<Client | null> => {
 
 export const addClient = async (client: Omit<Client, 'id' | 'created_by' | 'created_at' | 'updated_at' | 'follow_up_count'>): Promise<Client> => {
   const supabase = getSupabaseClient()
+  
+  // Get the current user ID
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('User not authenticated')
+  }
+  
   const { data, error } = await supabase
     .from('clients')
-    .insert([{ ...client, follow_up_count: 0 }])
+    .insert([{ ...client, created_by: user.id, follow_up_count: 0 }])
     .select()
     .single()
   
   if (error) {
     console.error('Supabase error in addClient:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to create client. Please make sure you are logged in.')
+    }
     throw error
   }
   return data as Client
@@ -60,6 +79,10 @@ export const updateClient = async (id: string, client: Partial<Client>): Promise
   
   if (error) {
     console.error('Supabase error in updateClient:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to update client. Please make sure you are logged in and have permission to edit this client.')
+    }
     throw error
   }
   return data as Client
@@ -74,6 +97,10 @@ export const deleteClient = async (id: string): Promise<void> => {
   
   if (error) {
     console.error('Supabase error in deleteClient:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to delete client. Please make sure you are logged in and have permission to delete this client.')
+    }
     throw error
   }
 }
@@ -89,6 +116,10 @@ export const getNotesByClientId = async (clientId: string): Promise<Note[]> => {
   
   if (error) {
     console.error('Supabase error in getNotesByClientId:', error)
+    // If it's a permission error, return empty array instead of throwing
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      return []
+    }
     throw error
   }
   return data as Note[]
@@ -104,6 +135,10 @@ export const createNote = async (note: Omit<Note, 'id' | 'created_at'>): Promise
   
   if (error) {
     console.error('Supabase error in createNote:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to create note. Please make sure you are logged in.')
+    }
     throw error
   }
   return data as Note
@@ -120,6 +155,10 @@ export const updateNote = async (id: string, content: string): Promise<Note> => 
   
   if (error) {
     console.error('Supabase error in updateNote:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to update note. Please make sure you are logged in and have permission to edit this note.')
+    }
     throw error
   }
   return data as Note
@@ -134,6 +173,10 @@ export const deleteNote = async (id: string): Promise<void> => {
   
   if (error) {
     console.error('Supabase error in deleteNote:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to delete note. Please make sure you are logged in and have permission to delete this note.')
+    }
     throw error
   }
 }
@@ -149,6 +192,10 @@ export const getAssetsByClientId = async (clientId: string): Promise<Asset[]> =>
   
   if (error) {
     console.error('Supabase error in getAssetsByClientId:', error)
+    // If it's a permission error, return empty array instead of throwing
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      return []
+    }
     throw error
   }
   return data as Asset[]
@@ -164,6 +211,10 @@ export const createAsset = async (asset: Omit<Asset, 'id' | 'created_at'>): Prom
   
   if (error) {
     console.error('Supabase error in createAsset:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to upload asset. Please make sure you are logged in.')
+    }
     throw error
   }
   return data as Asset
@@ -178,6 +229,10 @@ export const deleteAsset = async (id: string): Promise<void> => {
   
   if (error) {
     console.error('Supabase error in deleteAsset:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to delete asset. Please make sure you are logged in and have permission to delete this asset.')
+    }
     throw error
   }
 }
