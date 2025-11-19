@@ -247,8 +247,19 @@ export const getClosedClients = async (): Promise<ClosedClient[]> => {
   
   if (error) {
     console.error('Supabase error in getClosedClients:', error)
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    })
     // If it's a permission error, return empty array instead of throwing
     if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      return []
+    }
+    // If it's a "relation does not exist" error, the table doesn't exist
+    if (error.message.includes('relation "closedClients" does not exist')) {
+      console.error('The closedClients table does not exist in the database. Please run the DATABASE.sql script in your Supabase SQL editor.')
       return []
     }
     throw error
@@ -349,5 +360,53 @@ export const deleteClosedClient = async (id: string): Promise<void> => {
       throw new Error('Permission denied: Unable to delete closed client. Please make sure you are logged in and have permission to delete this client.')
     }
     throw error
+  }
+}
+
+/**
+ * Utility function to initialize the closedClients table
+ * This should be run once to create the table and policies in Supabase
+ */
+export const initializeClosedClientsTable = async (): Promise<{ success: boolean; message: string }> => {
+  try {
+    // This is just for documentation - you need to run the SQL in Supabase dashboard
+    const sql = `
+-- Create closedClients table
+CREATE TABLE IF NOT EXISTS closedClients (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_by UUID REFERENCES auth.users(id),
+  name TEXT NOT NULL,
+  videosPerMonth INTEGER NOT NULL,
+  chargePerVideo INTEGER NOT NULL,
+  monthlyRevenue INTEGER NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS (Row Level Security)
+ALTER TABLE closedClients ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for closedClients
+CREATE POLICY "Users can view their own closed clients" ON closedClients
+  FOR SELECT USING (created_by = auth.uid());
+
+CREATE POLICY "Users can insert their own closed clients" ON closedClients
+  FOR INSERT WITH CHECK (created_by = auth.uid());
+
+CREATE POLICY "Users can update their own closed clients" ON closedClients
+  FOR UPDATE USING (created_by = auth.uid());
+
+CREATE POLICY "Users can delete their own closed clients" ON closedClients
+  FOR DELETE USING (created_by = auth.uid());
+    `;
+
+    return {
+      success: true,
+      message: "Please run the following SQL in your Supabase SQL editor:\n\n" + sql
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Failed to generate initialization SQL: " + (error as Error).message
+    };
   }
 }

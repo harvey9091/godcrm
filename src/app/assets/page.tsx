@@ -67,6 +67,7 @@ export default function ClosedClientsPage() {
     } catch (error) {
       console.error('Error fetching closed clients:', error)
       // Show error in UI instead of toast
+      alert('Failed to fetch closed clients. Please make sure the closedClients table exists in your database.')
     }
   }
 
@@ -110,7 +111,12 @@ export default function ClosedClientsPage() {
       fetchClosedClients()
     } catch (error) {
       console.error('Error saving client:', error)
-      alert('Failed to save client')
+      // Check if it's a table doesn't exist error
+      if (error instanceof Error && error.message.includes('relation "closedClients" does not exist')) {
+        alert('The closedClients table does not exist in your database. Please run the DATABASE.sql script in your Supabase SQL editor.')
+      } else {
+        alert('Failed to save client. Please try again.')
+      }
     }
   }
 
