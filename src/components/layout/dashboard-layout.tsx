@@ -11,19 +11,22 @@ import {
   IconAsset, 
   IconLogout,
   IconMenu,
-  IconX
+  IconX,
+  IconSettings
 } from '@tabler/icons-react'
 import { Toaster } from 'sonner'
 import { User } from '@supabase/supabase-js'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: IconLayoutDashboard },
-  { name: 'Clients', href: '/clients', icon: IconUsers },
-  { name: 'Assets', href: '/assets', icon: IconAsset },
+  { name: 'Leads', href: '/clients', icon: IconUsers },
+  { name: 'Closed Clients', href: '/assets', icon: IconAsset },
+  { name: 'Settings', href: '/settings', icon: IconSettings },
 ]
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarHover, setSidebarHover] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const pathname = usePathname()
   const router = useRouter()
@@ -68,16 +71,20 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Sidebar */}
       <div 
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 left-0 z-50 bg-card border-r border-border transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+          sidebarOpen ? 'translate-x-0 w-64' : sidebarHover ? 'w-64' : 'w-16'
         }`}
+        onMouseEnter={() => setSidebarHover(true)}
+        onMouseLeave={() => setSidebarHover(false)}
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-border">
-          <div className="flex items-center">
-            <AnimatedGradientText className="text-xl font-bold">
-              GodCRM
-            </AnimatedGradientText>
-          </div>
+          {(sidebarOpen || sidebarHover) && (
+            <div className="flex items-center">
+              <AnimatedGradientText className="text-xl font-bold">
+                GodCRM
+              </AnimatedGradientText>
+            </div>
+          )}
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-1 rounded-md text-foreground hover:bg-accent"
@@ -99,35 +106,41 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     : 'text-foreground hover:bg-accent'
                 }`}
               >
-                <Icon className="mr-3 h-5 w-5" />
-                {item.name}
+                <Icon className="h-5 w-5" />
+                {(sidebarOpen || sidebarHover) && (
+                  <span className="ml-3">{item.name}</span>
+                )}
               </a>
             )
           })}
         </nav>
         <div className="p-4 border-t border-border">
           {user && (
-            <div className="flex items-center justify-between">
+            <div className={`flex items-center ${sidebarOpen || sidebarHover ? 'justify-between' : 'justify-center'}`}>
               <div className="flex items-center">
                 <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
                   <span className="text-primary-foreground text-sm font-medium">
                     {user.email?.charAt(0).toUpperCase()}
                   </span>
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-foreground">
-                    {user.email}
-                  </p>
-                </div>
+                {(sidebarOpen || sidebarHover) && (
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-foreground truncate max-w-[120px]">
+                      {user.email}
+                    </p>
+                  </div>
+                )}
               </div>
-              <Button
-                onClick={handleSignOut}
-                variant="ghost"
-                size="icon"
-                className="text-foreground hover:bg-accent"
-              >
-                <IconLogout className="h-5 w-5" />
-              </Button>
+              {(sidebarOpen || sidebarHover) && (
+                <Button
+                  onClick={handleSignOut}
+                  variant="ghost"
+                  size="icon"
+                  className="text-foreground hover:bg-accent"
+                >
+                  <IconLogout className="h-5 w-5" />
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -151,8 +164,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <div className="w-6" /> {/* Spacer for symmetry */}
         </div>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto focus:outline-none">
+        {/* Page content with custom scrollbar */}
+        <main className="flex-1 overflow-y-auto focus:outline-none custom-scrollbar">
           <div className="py-6">
             <div className="px-4 sm:px-6 lg:px-8">
               {children}
@@ -163,6 +176,22 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       
       {/* Toast notifications */}
       <Toaster />
+      
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(139, 92, 246, 0.5);
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(139, 92, 246, 0.7);
+        }
+      `}</style>
     </div>
   )
 }

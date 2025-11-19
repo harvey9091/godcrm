@@ -268,7 +268,7 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
   return (
     <Dialog open={open} onOpenChange={handleDiscard}>
       <DialogContent 
-        className="w-[95vw] max-w-[1600px] h-[90vh] rounded-2xl overflow-hidden shadow-2xl backdrop-blur-lg bg-card/40 border border-white/10 p-0"
+        className="!w-[80vw] !max-w-[1600px] !min-w-[70vw] h-[85vh] rounded-2xl overflow-hidden shadow-2xl backdrop-blur-lg bg-card/40 border border-white/10 p-0"
         style={{
           animation: open ? 'modalEnter 250ms ease-out' : 'modalExit 250ms ease-in'
         }}
