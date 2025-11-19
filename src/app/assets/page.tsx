@@ -67,6 +67,7 @@ export default function ClosedClientsPage() {
       console.log('Fetching closed clients...')
       const data = await getClosedClients()
       setClosedClients(data)
+      console.log('Successfully fetched closed clients:', data)
     } catch (error) {
       console.error('Error fetching closed clients:', error)
       setError('Failed to fetch closed clients. Please make sure the closedClients table exists in your database.')
@@ -115,7 +116,13 @@ export default function ClosedClientsPage() {
       fetchClosedClients()
     } catch (error) {
       console.error('Error saving client:', error)
-      setError(error instanceof Error ? error.message : 'Failed to save client. Please try again.')
+      if (error instanceof Error) {
+        setError(error.message)
+        alert(`Error: ${error.message}`)
+      } else {
+        setError('Failed to save client. Please try again.')
+        alert('Failed to save client. Please try again.')
+      }
     }
   }
 
