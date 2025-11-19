@@ -112,7 +112,7 @@ export default function ClosedClientsPage() {
     } catch (error) {
       console.error('Error saving client:', error)
       // Check if it's a table doesn't exist error
-      if (error instanceof Error && error.message.includes('relation "closedClients" does not exist')) {
+      if (error instanceof Error && (error.message.includes('relation "closedClients" does not exist') || error.message.includes('table "closedClients" does not exist'))) {
         alert('The closedClients table does not exist in your database. Please run the DATABASE.sql script in your Supabase SQL editor.')
       } else {
         alert('Failed to save client. Please try again.')

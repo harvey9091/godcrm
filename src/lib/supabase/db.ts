@@ -293,6 +293,11 @@ export const getClosedClients = async (): Promise<ClosedClient[]> => {
       console.error('The closedClients table does not exist in the database. Please run the DATABASE.sql script in your Supabase SQL editor.')
       return []
     }
+    // If it's a more general database error, provide a helpful message
+    if (error.code === '42P01') { // 42P01 is PostgreSQL's code for "undefined_table"
+      console.error('The closedClients table does not exist in the database. Please run the DATABASE.sql script in your Supabase SQL editor.')
+      return []
+    }
     throw error
   }
   return data as ClosedClient[] || []
