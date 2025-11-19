@@ -57,3 +57,12 @@ export type ClosedClient = {
   monthlyRevenue: number
   created_at: string
 }
+
+// Add the ClientEdit type for audit logging
+export type ClientEdit = {
+  id: string
+  client_id: string
+  changed_by: string
+  changed_at: string
+  changed_fields: Record<string, { old: unknown; new: unknown }>
+}

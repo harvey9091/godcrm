@@ -36,6 +36,7 @@ import {
   IconTrash,
   IconEdit
 } from '@tabler/icons-react'
+import { ClientEditModal } from '@/components/client-edit-modal'
 
 export default function ClientDetailsPage() {
   const [loading, setLoading] = useState(true)
@@ -47,6 +48,7 @@ export default function ClientDetailsPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<Partial<Client>>({})
   const [isMounted, setIsMounted] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const router = useRouter()
   const params = useParams()
 
@@ -143,6 +145,19 @@ export default function ClientDetailsPage() {
     setFormData({ ...formData, [field]: value })
   }
 
+  const handleEditClient = () => {
+    setIsEditing(false)
+    setIsEditModalOpen(true)
+  }
+
+  const handleSaveEditedClient = (updatedClient: Client) => {
+    setClient(updatedClient)
+    setFormData(updatedClient)
+    setIsEditModalOpen(false)
+    // Refresh the notes as well since the client update might have affected them
+    fetchNotes()
+  }
+
   if (!isMounted) {
     return (
       <DashboardLayout>
@@ -196,7 +211,8 @@ export default function ClientDetailsPage() {
                 </RainbowButton>
               </>
             ) : (
-              <RainbowButton onClick={() => setIsEditing(true)}>
+              <RainbowButton onClick={handleEditClient}>
+                <IconEdit className="w-4 h-4 mr-2" />
                 Edit Client
               </RainbowButton>
             )}
@@ -307,6 +323,11 @@ export default function ClientDetailsPage() {
                 <div>
                   <Label>Social Media</Label>
                   <div className="flex space-x-2 mt-1">
+                    {client.website && (
+                      <a href={client.website} target="_blank" rel="noopener noreferrer" className="text-violet-500 hover:text-violet-600">
+                        Website
+                      </a>
+                    )}
                     {client.youtube && (
                       <a href={client.youtube} target="_blank" rel="noopener noreferrer">
                         <IconBrandYoutube className="w-5 h-5 text-red-600" />
@@ -449,6 +470,12 @@ export default function ClientDetailsPage() {
           </CardContent>
         </Card>
       </div>
+      <ClientEditModal
+        client={client}
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSaveEditedClient}
+      />
     </DashboardLayout>
   )
 }

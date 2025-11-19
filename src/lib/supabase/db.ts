@@ -1,5 +1,5 @@
 import { createClient } from './client'
-import { Client, Note, Asset, ClosedClient } from '@/lib/types'
+import { Client, Note, Asset, ClosedClient, ClientEdit } from '@/lib/types'
 
 // Create a new client instance for each request to avoid state issues
 const getSupabaseClient = () => createClient()
@@ -66,6 +66,37 @@ export const addClient = async (client: Omit<Client, 'id' | 'created_by' | 'crea
     throw error
   }
   return data as Client
+}
+
+// Add function to log client edits
+export const logClientEdit = async (clientId: string, changedFields: Record<string, { old: unknown; new: unknown }>): Promise<ClientEdit> => {
+  const supabase = getSupabaseClient()
+  
+  // Get the current user ID
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('User not authenticated')
+  }
+  
+  const { data, error } = await supabase
+    .from('clientEdits')
+    .insert([{
+      client_id: clientId,
+      changed_by: user.id,
+      changed_fields: changedFields
+    }])
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Supabase error in logClientEdit:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to log client edit. Please make sure you are logged in.')
+    }
+    throw error
+  }
+  return data as ClientEdit
 }
 
 export const updateClient = async (id: string, client: Partial<Client>): Promise<Client> => {

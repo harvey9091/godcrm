@@ -16,14 +16,17 @@ import {
   IconX,
   IconUser,
   IconUsers,
-  IconInfoCircle
+  IconInfoCircle,
+  IconEdit
 } from '@tabler/icons-react'
 import { Client } from '@/lib/types'
+import { Button } from '@/components/ui/button'
 
 interface ClientDetailModalProps {
   client: Client | null
   open: boolean
   onClose: () => void
+  onEdit?: (client: Client) => void
 }
 
 interface YouTubeData {
@@ -35,7 +38,7 @@ interface YouTubeData {
   subscriber_count?: string
 }
 
-export function ClientDetailModal({ client, open, onClose }: ClientDetailModalProps) {
+export function ClientDetailModal({ client, open, onClose, onEdit }: ClientDetailModalProps) {
   const [youtubeData, setYoutubeData] = useState<YouTubeData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -164,7 +167,18 @@ export function ClientDetailModal({ client, open, onClose }: ClientDetailModalPr
               </div>
               
               <div className="flex-grow text-center md:text-left">
-                <h1 className="text-3xl font-bold text-white mb-4">{client.name}</h1>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                  <h1 className="text-3xl font-bold text-white">{client.name}</h1>
+                  {onEdit && (
+                    <Button 
+                      onClick={() => onEdit(client)}
+                      className="bg-violet-600 hover:bg-violet-700 text-white flex items-center gap-2"
+                    >
+                      <IconEdit className="w-4 h-4" />
+                      Edit Client
+                    </Button>
+                  )}
+                </div>
                 
                 {loading ? (
                   <div className="space-y-3">

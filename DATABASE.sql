@@ -128,3 +128,22 @@ $$ language 'plpgsql';
 -- Create trigger to automatically update updated_at
 CREATE TRIGGER update_clients_updated_at BEFORE UPDATE
   ON clients FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Create clientEdits audit log table
+CREATE TABLE clientEdits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
+  changed_by UUID REFERENCES auth.users(id),
+  changed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  changed_fields JSONB
+);
+
+-- Enable RLS (Row Level Security) for clientEdits
+ALTER TABLE clientEdits ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for clientEdits
+CREATE POLICY "Users can view edits for their clients" ON clientEdits
+  FOR SELECT USING (client_id IN (SELECT id FROM clients WHERE created_by = auth.uid()));
+
+CREATE POLICY "Users can insert edits for their clients" ON clientEdits
+  FOR INSERT WITH CHECK (client_id IN (SELECT id FROM clients WHERE created_by = auth.uid()));

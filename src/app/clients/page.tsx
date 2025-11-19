@@ -47,6 +47,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ClientDetailModal } from '@/components/client-detail-modal'
+import { ClientEditModal } from '@/components/client-edit-modal'
 
 export default function ClientsPage() {
   const [loading, setLoading] = useState(true)
@@ -59,7 +60,8 @@ export default function ClientsPage() {
   const [followUpStatusFilter, setFollowUpStatusFilter] = useState<string>('all')
   const [outreachTypeFilter, setOutreachTypeFilter] = useState<string>('all')
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const router = useRouter()
 
   const fetchClients = useCallback(async () => {
@@ -211,6 +213,36 @@ export default function ClientsPage() {
     setLeadTempFilter('all')
     setFollowUpStatusFilter('all')
     setOutreachTypeFilter('all')
+  }
+
+  const handleEditClient = (client: Client) => {
+    setSelectedClient(client)
+    setIsDetailModalOpen(false)
+    setIsEditModalOpen(true)
+  }
+
+  const handleSaveEditedClient = (updatedClient: Client) => {
+    // Update the client in the local state
+    setClients(prevClients => 
+      prevClients.map(client => 
+        client.id === updatedClient.id ? updatedClient : client
+      )
+    )
+    setFilteredClients(prevClients => 
+      prevClients.map(client => 
+        client.id === updatedClient.id ? updatedClient : client
+      )
+    )
+    
+    // If the selected client is the one being edited, update it
+    if (selectedClient && selectedClient.id === updatedClient.id) {
+      setSelectedClient(updatedClient)
+    }
+    
+    setIsEditModalOpen(false)
+    
+    // Refresh the client list to ensure consistency
+    fetchClients()
   }
 
   // Calculate KPIs
@@ -453,7 +485,7 @@ export default function ClientsPage() {
                             <button 
                               onClick={() => {
                                 setSelectedClient(client)
-                                setIsModalOpen(true)
+                                setIsDetailModalOpen(true)
                               }}
                               className="text-left hover:underline"
                             >
@@ -572,10 +604,13 @@ export default function ClientsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => router.push(`/clients/${client.id}`)}>
+                              <DropdownMenuItem onClick={() => {
+                                setSelectedClient(client)
+                                setIsDetailModalOpen(true)
+                              }}>
                                 View
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => router.push(`/clients/${client.id}`)}>
+                              <DropdownMenuItem onClick={() => handleEditClient(client)}>
                                 Edit
                               </DropdownMenuItem>
                               <DropdownMenuItem>
@@ -607,8 +642,15 @@ export default function ClientsPage() {
       </div>
       <ClientDetailModal 
         client={selectedClient} 
-        open={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+        open={isDetailModalOpen} 
+        onClose={() => setIsDetailModalOpen(false)}
+        onEdit={handleEditClient}
+      />
+      <ClientEditModal
+        client={selectedClient}
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSaveEditedClient}
       />
     </DashboardLayout>
   )
