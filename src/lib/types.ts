@@ -47,3 +47,13 @@ export type Asset = {
   file_name: string
   created_at: string
 }
+
+export type ClosedClient = {
+  id: string
+  created_by: string
+  name: string
+  videosPerMonth: number
+  chargePerVideo: number
+  monthlyRevenue: number
+  created_at: string
+}

@@ -1,5 +1,5 @@
 import { createClient } from './client'
-import { Client, Note, Asset } from '@/lib/types'
+import { Client, Note, Asset, ClosedClient } from '@/lib/types'
 
 // Create a new client instance for each request to avoid state issues
 const getSupabaseClient = () => createClient()
@@ -232,6 +232,121 @@ export const deleteAsset = async (id: string): Promise<void> => {
     // If it's a permission error, provide a more helpful message
     if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
       throw new Error('Permission denied: Unable to delete asset. Please make sure you are logged in and have permission to delete this asset.')
+    }
+    throw error
+  }
+}
+
+// Closed Clients
+export const getClosedClients = async (): Promise<ClosedClient[]> => {
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('closedClients')
+    .select('*')
+    .order('monthlyRevenue', { ascending: false })
+  
+  if (error) {
+    console.error('Supabase error in getClosedClients:', error)
+    // If it's a permission error, return empty array instead of throwing
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      return []
+    }
+    throw error
+  }
+  return data as ClosedClient[] || []
+}
+
+export const addClosedClient = async (client: Omit<ClosedClient, 'id' | 'created_by' | 'created_at' | 'monthlyRevenue'> & { videosPerMonth: number, chargePerVideo: number }): Promise<ClosedClient> => {
+  const supabase = getSupabaseClient()
+  
+  // Get the current user ID
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('User not authenticated')
+  }
+  
+  // Calculate monthly revenue on the server side
+  const monthlyRevenue = client.videosPerMonth * client.chargePerVideo
+  
+  const { data, error } = await supabase
+    .from('closedClients')
+    .insert([{ 
+      ...client, 
+      created_by: user.id,
+      monthlyRevenue
+    }])
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Supabase error in addClosedClient:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to create closed client. Please make sure you are logged in.')
+    }
+    throw error
+  }
+  return data as ClosedClient
+}
+
+export const updateClosedClient = async (id: string, client: Partial<ClosedClient>): Promise<ClosedClient> => {
+  const supabase = getSupabaseClient()
+  
+  // If videosPerMonth and chargePerVideo are provided, recalculate monthlyRevenue
+  let updateData = { ...client }
+  if (client.videosPerMonth !== undefined && client.chargePerVideo !== undefined) {
+    updateData = {
+      ...client,
+      monthlyRevenue: client.videosPerMonth * client.chargePerVideo
+    }
+  } else if (client.videosPerMonth !== undefined || client.chargePerVideo !== undefined) {
+    // If only one of them is provided, we need to fetch the other value to recalculate
+    const { data: existingClient } = await supabase
+      .from('closedClients')
+      .select('videosPerMonth, chargePerVideo')
+      .eq('id', id)
+      .single()
+    
+    if (existingClient) {
+      const videosPerMonth = client.videosPerMonth !== undefined ? client.videosPerMonth : existingClient.videosPerMonth
+      const chargePerVideo = client.chargePerVideo !== undefined ? client.chargePerVideo : existingClient.chargePerVideo
+      updateData = {
+        ...client,
+        monthlyRevenue: videosPerMonth * chargePerVideo
+      }
+    }
+  }
+  
+  const { data, error } = await supabase
+    .from('closedClients')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Supabase error in updateClosedClient:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to update closed client. Please make sure you are logged in and have permission to edit this client.')
+    }
+    throw error
+  }
+  return data as ClosedClient
+}
+
+export const deleteClosedClient = async (id: string): Promise<void> => {
+  const supabase = getSupabaseClient()
+  const { error } = await supabase
+    .from('closedClients')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Supabase error in deleteClosedClient:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to delete closed client. Please make sure you are logged in and have permission to delete this client.')
     }
     throw error
   }

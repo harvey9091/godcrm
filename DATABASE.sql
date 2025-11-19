@@ -50,10 +50,22 @@ CREATE TABLE assets (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Create closedClients table
+CREATE TABLE closedClients (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_by UUID REFERENCES auth.users(id),
+  name TEXT NOT NULL,
+  videosPerMonth INTEGER NOT NULL,
+  chargePerVideo INTEGER NOT NULL,
+  monthlyRevenue INTEGER NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Enable RLS (Row Level Security)
 ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE assets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE closedClients ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for clients
 CREATE POLICY "Users can view their own clients" ON clients
@@ -90,6 +102,19 @@ CREATE POLICY "Users can insert assets for their clients" ON assets
 
 CREATE POLICY "Users can delete assets for their clients" ON assets
   FOR DELETE USING (client_id IN (SELECT id FROM clients WHERE created_by = auth.uid()));
+
+-- Create policies for closedClients
+CREATE POLICY "Users can view their own closed clients" ON closedClients
+  FOR SELECT USING (created_by = auth.uid());
+
+CREATE POLICY "Users can insert their own closed clients" ON closedClients
+  FOR INSERT WITH CHECK (created_by = auth.uid());
+
+CREATE POLICY "Users can update their own closed clients" ON closedClients
+  FOR UPDATE USING (created_by = auth.uid());
+
+CREATE POLICY "Users can delete their own closed clients" ON closedClients
+  FOR DELETE USING (created_by = auth.uid());
 
 -- Create function to update updated_at column
 CREATE OR REPLACE FUNCTION update_updated_at_column()
