@@ -53,7 +53,7 @@ export const addClient = async (client: Omit<Client, 'id' | 'created_by' | 'crea
   
   const { data, error } = await supabase
     .from('clients')
-    .insert([{ ...client, created_by: user.id, follow_up_count: 0 }])
+    .insert([{ ...client, created_by: user.id }])
     .select()
     .single()
   

@@ -28,6 +28,7 @@ CREATE TABLE clients (
   source TEXT,
   tags TEXT,
   notes TEXT,
+  website TEXT,
   status TEXT CHECK (status IN ('active', 'ongoing', 'closed', 'dead')) DEFAULT 'active',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -137,6 +138,9 @@ CREATE TABLE clientEdits (
   changed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   changed_fields JSONB
 );
+
+-- Add website column to existing clients table
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS website TEXT;
 
 -- Enable RLS (Row Level Security) for clientEdits
 ALTER TABLE clientEdits ENABLE ROW LEVEL SECURITY;
