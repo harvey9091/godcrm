@@ -271,6 +271,10 @@ export const deleteAsset = async (id: string): Promise<void> => {
 // Closed Clients
 export const getClosedClients = async (): Promise<ClosedClient[]> => {
   const supabase = getSupabaseClient()
+  
+  // Log the request for debugging
+  console.log('Attempting to fetch closedClients from Supabase...')
+  
   const { data, error } = await supabase
     .from('closedClients')
     .select('*')
@@ -284,17 +288,17 @@ export const getClosedClients = async (): Promise<ClosedClient[]> => {
       details: error.details,
       hint: error.hint
     })
+    
+    // Log additional debugging information
+    console.error('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.error('Table name being accessed:', 'closedClients')
+    
     // If it's a permission error, return empty array instead of throwing
     if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
       return []
     }
     // If it's a "relation does not exist" error, the table doesn't exist
-    if (error.message.includes('relation "closedClients" does not exist')) {
-      console.error('The closedClients table does not exist in the database. Please run the DATABASE.sql script in your Supabase SQL editor.')
-      return []
-    }
-    // If it's a more general database error, provide a helpful message
-    if (error.code === '42P01') { // 42P01 is PostgreSQL's code for "undefined_table"
+    if (error.message.includes('relation "closedClients" does not exist') || error.code === '42P01') {
       console.error('The closedClients table does not exist in the database. Please run the DATABASE.sql script in your Supabase SQL editor.')
       return []
     }
@@ -306,6 +310,9 @@ export const getClosedClients = async (): Promise<ClosedClient[]> => {
 export const addClosedClient = async (client: Omit<ClosedClient, 'id' | 'created_by' | 'created_at' | 'monthlyRevenue'> & { videosPerMonth: number, chargePerVideo: number }): Promise<ClosedClient> => {
   const supabase = getSupabaseClient()
   
+  // Log the request for debugging
+  console.log('Attempting to add closedClient to Supabase...')
+  
   // Get the current user ID
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -315,6 +322,7 @@ export const addClosedClient = async (client: Omit<ClosedClient, 'id' | 'created
   // Calculate monthly revenue on the server side
   const monthlyRevenue = client.videosPerMonth * client.chargePerVideo
   
+  // Try the standard table name first
   const { data, error } = await supabase
     .from('closedClients')
     .insert([{ 
@@ -327,9 +335,24 @@ export const addClosedClient = async (client: Omit<ClosedClient, 'id' | 'created
   
   if (error) {
     console.error('Supabase error in addClosedClient:', error)
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    })
+    
+    // Log additional debugging information
+    console.error('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.error('Table name being accessed:', 'closedClients')
+    
     // If it's a permission error, provide a more helpful message
     if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
       throw new Error('Permission denied: Unable to create closed client. Please make sure you are logged in.')
+    }
+    // If it's a "relation does not exist" error, the table doesn't exist
+    if (error.message.includes('relation "closedClients" does not exist') || error.code === '42P01') {
+      throw new Error('The closedClients table does not exist in your database. Please run the DATABASE.sql script in your Supabase SQL editor.')
     }
     throw error
   }
