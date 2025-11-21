@@ -35,7 +35,13 @@ import {
   IconEye,
   IconChevronLeft,
   IconChevronRight,
-  IconAlertTriangle
+  IconAlertTriangle,
+  IconBrandYoutube,
+  IconBrandInstagram,
+  IconBrandTwitter,
+  IconBrandLinkedin,
+  IconBrandTiktok,
+  IconLink
 } from '@tabler/icons-react'
 import { Client } from '@/lib/types'
 
@@ -297,6 +303,7 @@ export default function ClientsPage() {
                           <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Status</th>
                           <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Lead Temp</th>
                           <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Follow-up</th>
+                          <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Socials</th>
                           <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Actions</th>
                         </tr>
                       </thead>
@@ -340,6 +347,70 @@ export default function ClientsPage() {
                                   Next: {new Date(client.next_follow_up_date).toLocaleDateString()}
                                 </div>
                               )}
+                            </td>
+                            <td className="py-3 px-2">
+                              <div className="flex items-center space-x-1">
+                                {client.youtube && (
+                                  <a 
+                                    href={client.youtube} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-white/70 hover:text-white transition-colors"
+                                    title="YouTube"
+                                  >
+                                    <IconBrandYoutube className="h-5 w-5" />
+                                  </a>
+                                )}
+                                {client.instagram && (
+                                  <a 
+                                    href={client.instagram} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-white/70 hover:text-white transition-colors"
+                                    title="Instagram"
+                                  >
+                                    <IconBrandInstagram className="h-5 w-5" />
+                                  </a>
+                                )}
+                                {client.twitter && (
+                                  <a 
+                                    href={client.twitter} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-white/70 hover:text-white transition-colors"
+                                    title="Twitter"
+                                  >
+                                    <IconBrandTwitter className="h-5 w-5" />
+                                  </a>
+                                )}
+                                {client.linkedin && (
+                                  <a 
+                                    href={client.linkedin} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-white/70 hover:text-white transition-colors"
+                                    title="LinkedIn"
+                                  >
+                                    <IconBrandLinkedin className="h-5 w-5" />
+                                  </a>
+                                )}
+                                {client.tiktok && (
+                                  <a 
+                                    href={client.tiktok} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-white/70 hover:text-white transition-colors"
+                                    title="TikTok"
+                                  >
+                                    <IconBrandTiktok className="h-5 w-5" />
+                                  </a>
+                                )}
+                                {!client.youtube && !client.instagram && !client.twitter && !client.linkedin && !client.tiktok && (
+                                  <span className="text-white/30">
+                                    <IconLink className="h-5 w-5" />
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td className="py-3 px-2">
                               <div className="flex items-center space-x-2">

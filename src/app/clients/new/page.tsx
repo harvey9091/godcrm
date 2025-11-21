@@ -180,7 +180,7 @@ export default function NewClientPage() {
           </Button>
         </div>
 
-        <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
+        <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
           <CardHeader className="pb-4 pt-5">
             <CardTitle>Add New Client for Outreach</CardTitle>
           </CardHeader>
@@ -190,7 +190,7 @@ export default function NewClientPage() {
                 {/* Left Column */}
                 <div className="space-y-6">
                   {/* Client Info Panel */}
-                  <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
+                  <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
                     <CardHeader className="pb-4 pt-5">
                       <CardTitle className="text-lg flex items-center">
                         <IconUser className="mr-2 h-5 w-5" />
@@ -245,7 +245,7 @@ export default function NewClientPage() {
                   </Card>
 
                   {/* Socials & Stats Panel */}
-                  <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
+                  <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
                     <CardHeader className="pb-4 pt-5">
                       <CardTitle className="text-lg flex items-center">
                         <IconLink className="mr-2 h-5 w-5" />
@@ -399,7 +399,7 @@ export default function NewClientPage() {
                 {/* Right Column */}
                 <div className="space-y-6">
                   {/* Outreach Details Panel */}
-                  <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
+                  <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
                     <CardHeader className="pb-4 pt-5">
                       <CardTitle className="text-lg flex items-center">
                         <IconMail className="mr-2 h-5 w-5" />
@@ -476,7 +476,7 @@ export default function NewClientPage() {
                   </Card>
 
                   {/* Follow-up Tracking Panel */}
-                  <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
+                  <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
                     <CardHeader className="pb-4 pt-5">
                       <CardTitle className="text-lg flex items-center justify-between">
                         <span className="flex items-center">
@@ -614,7 +614,7 @@ export default function NewClientPage() {
               </div>
 
               {/* Notes Panel (Collapsible) */}
-              <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg">
+              <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
                 <CardHeader 
                   className="pb-4 pt-5 cursor-pointer flex flex-row items-center justify-between"
                   onClick={() => toggleSection('notes')}

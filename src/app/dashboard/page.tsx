@@ -248,7 +248,7 @@ export default function DashboardPage() {
   ], [topClient, totalRevenue, outreachPerDay])
 
   // Calculate KPIs from live client data
-  const totalClients = useMemo(() => clients.length, [clients])
+  const totalClients = useMemo(() => closedClients.length, [closedClients])
   const newClients = useMemo(() => clients.filter(client => {
     const createdDate = new Date(client.created_at)
     const sevenDaysAgo = new Date()
@@ -264,7 +264,7 @@ export default function DashboardPage() {
   // Updated KPI data using live client data
   const kpiData = useMemo(() => [
     { title: 'Total Clients', value: totalClients.toString(), change: `+${newClients} from last week`, icon: <Users className="h-5 w-5" />, numericValue: totalClients },
-    { title: 'New Clients', value: newClients.toString(), change: `${newClients} this week`, icon: <UserPlus className="h-5 w-5" />, numericValue: newClients },
+    { title: 'New Leads', value: newClients.toString(), change: `${newClients} this week`, icon: <UserPlus className="h-5 w-5" />, numericValue: newClients },
     { title: 'Revenue', value: `$${totalRevenue.toLocaleString()}`, change: '+15% from last month', icon: <DollarSign className="h-5 w-5" />, numericValue: totalRevenue },
     { title: 'Outreaches Done', value: outreachesDone.toString(), change: `+${Math.max(0, 3 - outreachesDone)} remaining today`, icon: <Send className="h-5 w-5" />, numericValue: outreachesDone },
     { title: 'Follow Ups Pending', value: followUpsPending.toString(), change: '-2 from last week', icon: <Clock className="h-5 w-5" />, numericValue: followUpsPending },
@@ -443,7 +443,7 @@ export default function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-4 flex-grow flex flex-col">
-                <div className="flex-grow min-h-[100px]">
+                <div className="flex-grow min-h-[60px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />

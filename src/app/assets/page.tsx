@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSession } from '@/lib/supabase/auth'
 import { getClosedClients, addClosedClient, deleteClosedClient, getInvoicesByClientId, deleteInvoice } from '@/lib/supabase/db'
-import { addSampleClosedClients } from '@/lib/supabase/sample-data'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -25,8 +24,7 @@ import {
   IconDownload,
   IconAlertTriangle,
   IconUsers,
-  IconTrendingUp,
-  IconDatabaseImport
+  IconTrendingUp
 } from '@tabler/icons-react'
 import { Invoice } from '@/lib/types'
 
@@ -56,7 +54,6 @@ export default function ClosedClients() {
     month: '',
   })
   const [invoiceFile, setInvoiceFile] = useState<File | null>(null)
-  const [error, setError] = useState<string | null>(null)
   // Fetch closed clients and their invoices
   const fetchClosedClients = async () => {
     try {
@@ -81,7 +78,6 @@ export default function ClosedClients() {
       setInvoices(invoicesObj)
     } catch (err) {
       console.error('Error fetching closed clients:', err)
-      setError('Failed to fetch closed clients. Please try again later.')
     }
   }
 
@@ -185,17 +181,6 @@ export default function ClosedClients() {
       })
     } catch (err) {
       console.error('Error deleting invoice:', err)
-      setError('Failed to delete invoice. Please try again later.')
-    }
-  }
-
-  const addSampleData = async () => {
-    try {
-      await addSampleClosedClients()
-      await fetchClosedClients()
-    } catch (err) {
-      console.error('Error adding sample data:', err)
-      setError('Failed to add sample data. Please try again later.')
     }
   }
 
@@ -206,7 +191,6 @@ export default function ClosedClients() {
     }
 
     try {
-      setError(null)
       console.log('Saving closed client...')
       await addClosedClient({
         name: formData.name,
@@ -229,10 +213,8 @@ export default function ClosedClients() {
     } catch (error) {
       console.error('Error saving client:', error)
       if (error instanceof Error) {
-        setError(error.message)
         showToast(`Error: ${error.message}`, 'error')
       } else {
-        setError('Failed to save client. Please try again.')
         showToast('Failed to save client. Please try again.', 'error')
       }
     }
@@ -262,32 +244,14 @@ export default function ClosedClients() {
             <h1 className="text-3xl font-bold text-white">Closed Clients</h1>
             <p className="text-white/70 mt-1">Manage your closed clients and their invoices</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
-              onClick={addSampleData}
-              className="bg-violet-600 hover:bg-violet-700 text-white rounded-[12px] flex items-center"
-            >
-              <IconDatabaseImport className="mr-2 h-4 w-4" />
-              Add Sample Data
-            </Button>
-            <Button 
-              onClick={() => setIsAddClientModalOpen(true)}
-              className="bg-violet-600 hover:bg-violet-700 text-white rounded-[12px] flex items-center"
-            >
-              <IconPlus className="mr-2 h-4 w-4" />
-              Add Client
-            </Button>
-          </div>
+          <Button 
+            onClick={() => setIsAddClientModalOpen(true)}
+            className="bg-violet-600 hover:bg-violet-700 text-white rounded-[12px] flex items-center"
+          >
+            <IconPlus className="mr-2 h-4 w-4" />
+            Add Client
+          </Button>
         </div>
-
-        {error && (
-          <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 backdrop-blur-sm">
-            <div className="flex items-center">
-              <IconAlertTriangle className="h-5 w-5 text-red-400 mr-2" />
-              <span className="text-red-200">{error}</span>
-            </div>
-          </div>
-        )}
 
         {/* Closed Clients Grid */}
         {closedClients.length > 0 ? (
