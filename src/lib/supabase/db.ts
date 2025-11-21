@@ -1,5 +1,5 @@
 import { createClient } from './client'
-import { Client, Note, Asset, ClosedClient, ClientEdit } from '@/lib/types'
+import { Client, Note, Asset, ClosedClient, ClientEdit, Invoice } from '@/lib/types'
 
 // Create a new client instance for each request to avoid state issues
 const getSupabaseClient = () => createClient()
@@ -268,6 +268,82 @@ export const deleteAsset = async (id: string): Promise<void> => {
   }
 }
 
+// Invoices
+export const getInvoicesByClientId = async (clientId: string): Promise<Invoice[]> => {
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*')
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: false })
+  
+  if (error) {
+    console.error('Supabase error in getInvoicesByClientId:', error)
+    // If it's a permission error, return empty array instead of throwing
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      return []
+    }
+    throw error
+  }
+  return data as Invoice[]
+}
+
+export const createInvoice = async (invoice: Omit<Invoice, 'id' | 'created_at'>): Promise<Invoice> => {
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('invoices')
+    .insert([{ ...invoice, created_at: new Date().toISOString() }])
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Supabase error in createInvoice:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to create invoice. Please make sure you are logged in.')
+    }
+    throw error
+  }
+  return data as Invoice
+}
+
+export const updateInvoice = async (id: string, invoice: Partial<Invoice>): Promise<Invoice> => {
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('invoices')
+    .update(invoice)
+    .eq('id', id)
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Supabase error in updateInvoice:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to update invoice. Please make sure you are logged in and have permission to edit this invoice.')
+    }
+    throw error
+  }
+  return data as Invoice
+}
+
+export const deleteInvoice = async (id: string): Promise<void> => {
+  const supabase = getSupabaseClient()
+  const { error } = await supabase
+    .from('invoices')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Supabase error in deleteInvoice:', error)
+    // If it's a permission error, provide a more helpful message
+    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+      throw new Error('Permission denied: Unable to delete invoice. Please make sure you are logged in and have permission to delete this invoice.')
+    }
+    throw error
+  }
+}
+
 // Closed Clients
 export const getClosedClients = async (): Promise<ClosedClient[]> => {
   const supabase = getSupabaseClient()
@@ -275,49 +351,89 @@ export const getClosedClients = async (): Promise<ClosedClient[]> => {
   // Log the request for debugging
   console.log('Attempting to fetch closedClients from Supabase...')
   
-  const { data, error } = await supabase
-    .from('closedClients')
-    .select('*')
-    .order('monthlyRevenue', { ascending: false })
-  
-  if (error) {
-    console.error('Supabase error in getClosedClients:', error)
-    console.error('Error details:', {
-      message: error.message,
-      code: error.code,
-      details: error.details,
-      hint: error.hint
-    })
+  try {
+    // Use snake_case column names to match the actual database schema
+    const { data, error } = await supabase
+      .from('closedClients')
+      .select(`
+        id,
+        created_by,
+        name,
+        videospermonth,
+        chargepervideo,
+        monthlyrevenue,
+        created_at
+      `)
+      .order('monthlyrevenue', { ascending: false })
     
-    // Log additional debugging information
-    console.error('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
-    console.error('Table name being accessed:', 'closedClients')
-    
-    // Handle specific error cases
-    if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
-      console.error('Permission denied. Check your Supabase credentials and RLS policies.')
-      return []
+    if (error) {
+      console.error('Supabase error in getClosedClients:', error)
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      })
+      
+      // Log additional debugging information
+      console.error('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+      console.error('Table name being accessed:', 'closedClients')
+      
+      // Handle specific error cases with more detailed messages
+      if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
+        console.error('Permission denied. Check your Supabase credentials and RLS policies.')
+        throw new Error('Permission denied: Unable to fetch closed clients. Please make sure you are logged in and have the correct permissions.')
+      }
+      
+      // Handle "relation does not exist" error
+      if (error.message.includes('relation') && error.message.includes('does not exist')) {
+        console.error('The closedClients table does not exist in the database.')
+        console.error('Please run the create-closed-clients-table.sql script in your Supabase SQL editor.')
+        throw new Error('The closedClients table does not exist in your database. Please make sure you have run the create-closed-clients-table.sql script in your Supabase SQL editor.')
+      }
+      
+      // Handle column does not exist error
+      if (error.message.includes('column') && error.message.includes('does not exist')) {
+        console.error('A required column is missing from the closedClients table.')
+        console.error('This typically happens when the table structure is incomplete.')
+        throw new Error('Column missing error: ' + error.message + '. Please make sure all required columns exist in your closedClients table.')
+      }
+      
+      // Handle 404 errors specifically
+      if (error.code === '404' || error.message.includes('404')) {
+        console.error('Received 404 error when trying to access closedClients table.')
+        console.error('This confirms the table does not exist.')
+        console.error('Please run the create-closed-clients-table.sql script in your Supabase SQL editor.')
+        throw new Error('The closedClients table was not found in your database. Please make sure you have run the create-closed-clients-table.sql script in your Supabase SQL editor.')
+      }
+      
+      // Handle network/connection errors
+      if (error.message.includes('connection') || error.message.includes('network') || error.message.includes('fetch')) {
+        console.error('Network error when trying to access closedClients table.')
+        throw new Error('Network error: Unable to connect to the database. Please check your internet connection and Supabase configuration.')
+      }
+      
+      // For any other errors, provide a more user-friendly message
+      throw new Error(`Database error: ${error.message}`)
     }
     
-    // Handle "relation does not exist" error
-    if (error.message.includes('relation') && error.message.includes('does not exist')) {
-      console.error('The closedClients table does not exist in the database.')
-      console.error('Please run the create-closed-clients-table.sql script in your Supabase SQL editor.')
-      return []
-    }
+    // Transform the snake_case data to camelCase to match the TypeScript interface
+    const transformedData = data.map((item: Record<string, unknown>) => ({
+      id: item.id,
+      created_by: item.created_by,
+      name: item.name,
+      videosPerMonth: item.videospermonth,
+      chargePerVideo: item.chargepervideo,
+      monthlyRevenue: item.monthlyrevenue,
+      created_at: item.created_at
+    }))
     
-    // Handle 404 errors specifically
-    if (error.code === '404' || error.message.includes('404')) {
-      console.error('Received 404 error when trying to access closedClients table.')
-      console.error('This confirms the table does not exist.')
-      console.error('Please run the create-closed-clients-table.sql script in your Supabase SQL editor.')
-      return []
-    }
-    
-    // For any other errors, rethrow
-    throw error
+    return transformedData as ClosedClient[] || []
+  } catch (err) {
+    // Handle any unexpected errors
+    console.error('Unexpected error in getClosedClients:', err)
+    throw new Error(`Unexpected error: ${(err as Error).message}`)
   }
-  return data as ClosedClient[] || []
 }
 
 export const addClosedClient = async (client: Omit<ClosedClient, 'id' | 'created_by' | 'created_at' | 'monthlyRevenue'> & { videosPerMonth: number, chargePerVideo: number }): Promise<ClosedClient> => {
@@ -335,14 +451,25 @@ export const addClosedClient = async (client: Omit<ClosedClient, 'id' | 'created
   // Calculate monthly revenue on the server side
   const monthlyRevenue = client.videosPerMonth * client.chargePerVideo
   
+  // Use snake_case column names to match the actual database schema
   const { data, error } = await supabase
     .from('closedClients')
     .insert([{ 
-      ...client, 
-      created_by: user.id,
-      monthlyRevenue
+      name: client.name,
+      videospermonth: client.videosPerMonth,
+      chargepervideo: client.chargePerVideo,
+      monthlyrevenue: monthlyRevenue,
+      created_by: user.id
     }])
-    .select()
+    .select(`
+      id,
+      created_by,
+      name,
+      videospermonth,
+      chargepervideo,
+      monthlyrevenue,
+      created_at
+    `)
     .single()
   
   if (error) {
@@ -375,34 +502,46 @@ export const addClosedClient = async (client: Omit<ClosedClient, 'id' | 'created
     
     throw error
   }
-  return data as ClosedClient
+  
+  // Transform the snake_case data to camelCase to match the TypeScript interface
+  const transformedData = {
+    id: data.id,
+    created_by: data.created_by,
+    name: data.name,
+    videosPerMonth: data.videospermonth,
+    chargePerVideo: data.chargepervideo,
+    monthlyRevenue: data.monthlyrevenue,
+    created_at: data.created_at
+  }
+  
+  return transformedData as ClosedClient
 }
 
 export const updateClosedClient = async (id: string, client: Partial<ClosedClient>): Promise<ClosedClient> => {
   const supabase = getSupabaseClient()
   
+  // Prepare update data with snake_case column names
+  const updateData: Record<string, unknown> = {}
+  
+  if (client.name !== undefined) updateData.name = client.name
+  if (client.videosPerMonth !== undefined) updateData.videospermonth = client.videosPerMonth
+  if (client.chargePerVideo !== undefined) updateData.chargepervideo = client.chargePerVideo
+  
   // If videosPerMonth and chargePerVideo are provided, recalculate monthlyRevenue
-  let updateData = { ...client }
   if (client.videosPerMonth !== undefined && client.chargePerVideo !== undefined) {
-    updateData = {
-      ...client,
-      monthlyRevenue: client.videosPerMonth * client.chargePerVideo
-    }
+    updateData.monthlyrevenue = client.videosPerMonth * client.chargePerVideo
   } else if (client.videosPerMonth !== undefined || client.chargePerVideo !== undefined) {
     // If only one of them is provided, we need to fetch the other value to recalculate
     const { data: existingClient } = await supabase
       .from('closedClients')
-      .select('videosPerMonth, chargePerVideo')
+      .select('videospermonth, chargepervideo')
       .eq('id', id)
       .single()
     
     if (existingClient) {
-      const videosPerMonth = client.videosPerMonth !== undefined ? client.videosPerMonth : existingClient.videosPerMonth
-      const chargePerVideo = client.chargePerVideo !== undefined ? client.chargePerVideo : existingClient.chargePerVideo
-      updateData = {
-        ...client,
-        monthlyRevenue: videosPerMonth * chargePerVideo
-      }
+      const videosPerMonth = client.videosPerMonth !== undefined ? client.videosPerMonth : existingClient.videospermonth
+      const chargePerVideo = client.chargePerVideo !== undefined ? client.chargePerVideo : existingClient.chargepervideo
+      updateData.monthlyrevenue = videosPerMonth * chargePerVideo
     }
   }
   
@@ -410,7 +549,15 @@ export const updateClosedClient = async (id: string, client: Partial<ClosedClien
     .from('closedClients')
     .update(updateData)
     .eq('id', id)
-    .select()
+    .select(`
+      id,
+      created_by,
+      name,
+      videospermonth,
+      chargepervideo,
+      monthlyrevenue,
+      created_at
+    `)
     .single()
   
   if (error) {
@@ -421,7 +568,19 @@ export const updateClosedClient = async (id: string, client: Partial<ClosedClien
     }
     throw error
   }
-  return data as ClosedClient
+  
+  // Transform the snake_case data to camelCase to match the TypeScript interface
+  const transformedData = {
+    id: data.id,
+    created_by: data.created_by,
+    name: data.name,
+    videosPerMonth: data.videospermonth,
+    chargePerVideo: data.chargepervideo,
+    monthlyRevenue: data.monthlyrevenue,
+    created_at: data.created_at
+  }
+  
+  return transformedData as ClosedClient
 }
 
 export const deleteClosedClient = async (id: string): Promise<void> => {
@@ -438,53 +597,5 @@ export const deleteClosedClient = async (id: string): Promise<void> => {
       throw new Error('Permission denied: Unable to delete closed client. Please make sure you are logged in and have permission to delete this client.')
     }
     throw error
-  }
-}
-
-/**
- * Utility function to initialize the closedClients table
- * This should be run once to create the table and policies in Supabase
- */
-export const initializeClosedClientsTable = async (): Promise<{ success: boolean; message: string }> => {
-  try {
-    // This is just for documentation - you need to run the SQL in Supabase dashboard
-    const sql = `
--- Create closedClients table
-CREATE TABLE IF NOT EXISTS closedClients (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_by UUID REFERENCES auth.users(id),
-  name TEXT NOT NULL,
-  videosPerMonth INTEGER NOT NULL,
-  chargePerVideo INTEGER NOT NULL,
-  monthlyRevenue INTEGER NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Enable RLS (Row Level Security)
-ALTER TABLE closedClients ENABLE ROW LEVEL SECURITY;
-
--- Create policies for closedClients
-CREATE POLICY "Users can view their own closed clients" ON closedClients
-  FOR SELECT USING (created_by = auth.uid());
-
-CREATE POLICY "Users can insert their own closed clients" ON closedClients
-  FOR INSERT WITH CHECK (created_by = auth.uid());
-
-CREATE POLICY "Users can update their own closed clients" ON closedClients
-  FOR UPDATE USING (created_by = auth.uid());
-
-CREATE POLICY "Users can delete their own closed clients" ON closedClients
-  FOR DELETE USING (created_by = auth.uid());
-    `;
-
-    return {
-      success: true,
-      message: "Please run the following SQL in your Supabase SQL editor:\n\n" + sql
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: "Failed to generate initialization SQL: " + (error as Error).message
-    };
   }
 }

@@ -95,7 +95,8 @@
   --shadow-blur: var(--shadow-blur);
   --shadow-opacity: var(--shadow-opacity);
   --color-shadow-color: var(--shadow-color);
-  --color-destructive-foreground: var(--destructive-foreground)}
+  --color-destructive-foreground: var(--destructive-foreground)
+}
 
 @tailwind base;
 @tailwind components;
@@ -214,7 +215,11 @@
   --shadow-lg: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 4px 6px -1px hsl(0 0% 0% / 0.16);
   --shadow-xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 8px 10px -1px hsl(0 0% 0% / 0.16);
   --shadow-2xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.40);
-  --tracking-normal: -0.025em;}
+  --tracking-normal: -0.025em;
+  --accent-violet: oklch(0.6132 0.2294 291.7437); /* Added for glassmorphism gradients */
+  --accent-indigo: oklch(0.5393 0.2713 286.7462); /* Added for glassmorphism gradients */
+  --accent-highlight: oklch(0.7 0.2 280); /* Added for animated number highlight */
+}
 
 .dark {
   --background: oklch(0.2223 0.0060 271.1393);
@@ -268,7 +273,11 @@
   --shadow-md: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 2px 4px -1px hsl(0 0% 0% / 0.16);
   --shadow-lg: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 4px 6px -1px hsl(0 0% 0% / 0.16);
   --shadow-xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 8px 10px -1px hsl(0 0% 0% / 0.16);
-  --shadow-2xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.40);}
+  --shadow-2xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.40);
+  --accent-violet: oklch(0.6132 0.2294 291.7437); /* Added for glassmorphism gradients */
+  --accent-indigo: oklch(0.5393 0.2713 286.7462); /* Added for glassmorphism gradients */
+  --accent-highlight: oklch(0.7 0.2 280); /* Added for animated number highlight */
+}
 
 @layer base {
   * {
@@ -293,13 +302,34 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #ec4899, #8b5cf6);
+  background: linear-gradient(180deg, #9b5cff, #8b5cf6);
   border-radius: 10px;
-  box-shadow: 0 0 4px rgba(147, 51, 234, 0.3);
+  box-shadow: 0 0 4px rgba(155, 92, 255, 0.5);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #f97316, #ec4899);
+  background: linear-gradient(180deg, #8b5cf6, #9b5cff);
+}
+
+/* Glassmorphism utility classes */
+.backdrop-blur-3xl {
+  backdrop-filter: blur(32px);
+}
+
+/* Animation utilities */
+.animate-fadeInUp {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* stylelint-enable at-rule-no-unknown */

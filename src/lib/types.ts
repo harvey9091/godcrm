@@ -58,6 +58,17 @@ export type ClosedClient = {
   created_at: string
 }
 
+// Add the Invoice type for client invoices
+export type Invoice = {
+  id: string
+  client_id: string
+  amount: number
+  status: 'paid' | 'pending'
+  file_url: string
+  month: string // Format: YYYY-MM
+  created_at: string
+}
+
 // Add the ClientEdit type for audit logging
 export type ClientEdit = {
   id: string

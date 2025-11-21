@@ -6,25 +6,17 @@ import { getSession } from '@/lib/supabase/auth'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { TypingAnimation } from '@/components/ui/typing-animation'
 import { AnimatedShinyText } from '@/components/ui/animated-shiny-text'
-import { AnimatedGradientText } from '@/components/ui/animated-gradient-text'
-import { RainbowButton } from '@/components/ui/rainbow-button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAnimatedNumber } from '@/components/ui/use-animated-number'
 import { 
-  BarChart, 
-  Bar, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  Legend, 
   ResponsiveContainer,
-  LineChart,
   Line,
   AreaChart,
   Area,
-  PieChart,
-  Pie,
-  Cell
 } from 'recharts'
 import { 
   Users, 
@@ -35,19 +27,11 @@ import {
   ChevronRight,
   TrendingUp,
   Trophy,
-  Award,
   Target
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Client } from '@/lib/types'
 import { getClients } from '@/lib/supabase/db'
+import { getClosedClients } from '@/lib/supabase/db'
 
 // Define type for KPI data
 interface KpiItem {
@@ -55,6 +39,32 @@ interface KpiItem {
   value: string
   change: string
   icon: React.ReactNode
+  numericValue: number
+}
+
+// Define type for client with revenue
+interface ClientWithRevenue extends Client {
+  revenue: number
+}
+
+// Define type for closed client data
+interface DashboardClosedClient {
+  id: string
+  name: string
+  revenue: number
+  created_at: string
+  status: 'closed'
+}
+
+// Define the closed client type from the database
+interface ClosedClientFromDB {
+  id: string
+  created_by: string
+  name: string
+  videosPerMonth: number
+  chargePerVideo: number
+  monthlyRevenue: number
+  created_at: string
 }
 
 // Mock data for the charts
@@ -73,23 +83,86 @@ const chartData = [
   { name: 'Dec', clients: 15, revenue: 120000 },
 ]
 
+// Animated Number Component with premium Apple-style easing
+const AnimatedNumber = ({ value, prefix = '', duration = 1200 }: { value: number; prefix?: string; duration?: number }) => {
+  const { displayValue, isAnimating } = useAnimatedNumber({
+    value,
+    duration,
+    formatFn: (val) => `${prefix}${Math.round(val).toLocaleString()}`
+  });
+
+  return (
+    <span 
+      className={`transition-all duration-300 ${isAnimating ? 'text-white/90' : 'text-white'}`}
+      aria-live="polite"
+    >
+      {displayValue}
+    </span>
+  );
+};
+
+// Animated Currency Component with premium Apple-style easing
+const AnimatedCurrency = ({ value, duration = 1200 }: { value: number; duration?: number }) => {
+  const { displayValue, isAnimating } = useAnimatedNumber({
+    value,
+    duration,
+    formatFn: (val) => `$${Math.round(val).toLocaleString()}`
+  });
+
+  return (
+    <span 
+      className={`transition-all duration-300 ${isAnimating ? 'text-white/90' : 'text-white'}`}
+      aria-live="polite"
+    >
+      {displayValue}
+    </span>
+  );
+};
+
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [isMounted, setIsMounted] = useState(false)
   const [clients, setClients] = useState<Client[]>([])
+  const [closedClients, setClosedClients] = useState<DashboardClosedClient[]>([])
   const router = useRouter()
   
   // Get latest 3 clients for the dashboard
   const latestClients = clients.slice(0, 3)
 
-  // Calculate mock revenue data for clients (since there's no revenue field in the schema)
-  const clientsWithRevenue = useMemo(() => clients.map(client => ({
-    ...client,
-    revenue: Math.floor(Math.random() * 10000) + 1000 // Random revenue between $1,000 and $10,000
-  })).sort((a, b) => b.revenue - a.revenue), [clients])
+  // Calculate revenue data from closed clients instead of random data
+  const clientsWithRevenue = useMemo(() => {
+    // If we have closed client data, use it
+    if (closedClients.length > 0) {
+      // Map closed clients to the format needed for dashboard
+      const closedClientData: ClientWithRevenue[] = closedClients.map(client => ({
+        id: client.id,
+        name: client.name,
+        revenue: client.revenue,
+        created_at: client.created_at,
+        status: 'closed'
+      } as ClientWithRevenue));
+      
+      // Combine with regular clients (for non-revenue data)
+      const combinedClients: ClientWithRevenue[] = [...clients.map(c => ({...c, revenue: 0})), ...closedClientData];
+      
+      // Sort by revenue
+      return combinedClients.sort((a, b) => b.revenue - a.revenue);
+    }
+    
+    // If no closed clients, create mock data based on regular clients for demonstration
+    if (clients.length > 0) {
+      return clients.map(client => ({
+        ...client,
+        revenue: Math.floor(Math.random() * 5000) + 1000 // Random revenue between $1,000 and $6,000 for demo
+      })).sort((a, b) => b.revenue - a.revenue);
+    }
+    
+    // Return empty array if no clients
+    return [];
+  }, [clients, closedClients]);
 
-  // Calculate total revenue
-  const totalRevenue = useMemo(() => clientsWithRevenue.reduce((sum, client) => sum + client.revenue, 0), [clientsWithRevenue])
+  // Calculate total revenue from closed clients
+  const totalRevenue = useMemo(() => closedClients.reduce((sum, client) => sum + client.revenue, 0), [closedClients])
 
   // Get top client
   const topClient = useMemo(() => clientsWithRevenue[0], [clientsWithRevenue])
@@ -101,25 +174,59 @@ export default function DashboardPage() {
   const outreachCount = useMemo(() => clients.filter(client => client.outreach_date).length, [clients])
   const outreachPerDay = useMemo(() => outreachCount > 0 ? outreachCount / 7 : 0, [outreachCount]) // Assuming 7 days
 
-  // Suggested hire logic
+  // Suggested hire logic - with fallback for when there's no revenue data
   const suggestedHire = useMemo(() => {
+    // If we have no closed client data, fall back to using regular client count
+    const clientCount = clients.length;
+    
     if (totalRevenue > 50000 && outreachPerDay >= 3) {
       return 'Sales Assistant'
     } else if (totalRevenue > 30000 && outreachPerDay >= 2) {
       return 'Project Manager'
     } else if (totalRevenue > 15000) {
       return 'Junior Editor'
+    } else if (clientCount > 20) {
+      // Fallback logic based on client count
+      return 'Junior Editor'
+    } else if (clientCount > 10) {
+      return 'Editor'
     }
-    return 'Editor'
-  }, [totalRevenue, outreachPerDay])
+    return 'Freelancer'
+  }, [totalRevenue, outreachPerDay, clients.length])
 
-  // Allocation split
-  const allocation = useMemo(() => ({
-    operations: { percentage: 40, amount: totalRevenue * 0.4 },
-    payroll: { percentage: 30, amount: totalRevenue * 0.3 },
-    growth: { percentage: 20, amount: totalRevenue * 0.2 },
-    savings: { percentage: 10, amount: totalRevenue * 0.1 }
-  }), [totalRevenue])
+  // Allocation split - with fallback for when there's no revenue
+  const allocation = useMemo(() => {
+    // If no revenue, use a default allocation based on client count
+    if (totalRevenue <= 0) {
+      const clientCount = clients.length;
+      if (clientCount > 0) {
+        // Create mock revenue based on client count for demonstration
+        const mockRevenue = clientCount * 1000;
+        return {
+          operations: { percentage: 40, amount: mockRevenue * 0.4 },
+          payroll: { percentage: 30, amount: mockRevenue * 0.3 },
+          growth: { percentage: 20, amount: mockRevenue * 0.2 },
+          savings: { percentage: 10, amount: mockRevenue * 0.1 }
+        };
+      }
+      
+      // Default values when no data
+      return {
+        operations: { percentage: 40, amount: 0 },
+        payroll: { percentage: 30, amount: 0 },
+        growth: { percentage: 20, amount: 0 },
+        savings: { percentage: 10, amount: 0 }
+      };
+    }
+    
+    // Use real revenue data when available
+    return {
+      operations: { percentage: 40, amount: totalRevenue * 0.4 },
+      payroll: { percentage: 30, amount: totalRevenue * 0.3 },
+      growth: { percentage: 20, amount: totalRevenue * 0.2 },
+      savings: { percentage: 10, amount: totalRevenue * 0.1 }
+    };
+  }, [totalRevenue, clients.length])
 
   // Time estimate for top client
   const timeEstimate = useMemo(() => {
@@ -156,11 +263,11 @@ export default function DashboardPage() {
 
   // Updated KPI data using live client data
   const kpiData = useMemo(() => [
-    { title: 'Total Clients', value: totalClients.toString(), change: `+${newClients} from last week`, icon: <Users className="h-5 w-5" /> },
-    { title: 'New Clients', value: newClients.toString(), change: `${newClients} this week`, icon: <UserPlus className="h-5 w-5" /> },
-    { title: 'Revenue', value: `$${totalRevenue.toLocaleString()}`, change: '+15% from last month', icon: <DollarSign className="h-5 w-5" /> },
-    { title: 'Outreaches Done', value: outreachesDone.toString(), change: `+${Math.max(0, 3 - outreachesDone)} remaining today`, icon: <Send className="h-5 w-5" /> },
-    { title: 'Follow Ups Pending', value: followUpsPending.toString(), change: '-2 from last week', icon: <Clock className="h-5 w-5" /> },
+    { title: 'Total Clients', value: totalClients.toString(), change: `+${newClients} from last week`, icon: <Users className="h-5 w-5" />, numericValue: totalClients },
+    { title: 'New Clients', value: newClients.toString(), change: `${newClients} this week`, icon: <UserPlus className="h-5 w-5" />, numericValue: newClients },
+    { title: 'Revenue', value: `$${totalRevenue.toLocaleString()}`, change: '+15% from last month', icon: <DollarSign className="h-5 w-5" />, numericValue: totalRevenue },
+    { title: 'Outreaches Done', value: outreachesDone.toString(), change: `+${Math.max(0, 3 - outreachesDone)} remaining today`, icon: <Send className="h-5 w-5" />, numericValue: outreachesDone },
+    { title: 'Follow Ups Pending', value: followUpsPending.toString(), change: '-2 from last week', icon: <Clock className="h-5 w-5" />, numericValue: followUpsPending },
   ], [totalClients, newClients, totalRevenue, outreachesDone, followUpsPending])
 
   useEffect(() => {
@@ -198,8 +305,27 @@ export default function DashboardPage() {
       }
     }
 
+    const fetchClosedClientsData = async () => {
+      try {
+        const closedClientData = await getClosedClients()
+        // Transform the data to match DashboardClosedClient interface
+        const transformedData: DashboardClosedClient[] = closedClientData.map(client => ({
+          id: client.id,
+          name: client.name,
+          revenue: client.monthlyRevenue,
+          created_at: client.created_at,
+          status: 'closed'
+        }))
+        setClosedClients(transformedData || [])
+      } catch (error) {
+        console.error('Error fetching closed clients:', error)
+        setClosedClients([])
+      }
+    }
+
     checkAuth()
     fetchClients()
+    fetchClosedClientsData()
   }, [router])
 
   if (!isMounted) {
@@ -235,118 +361,144 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-[calc(100vh-80px)]">
+      {/* Background video for Apple-style grainy effect */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(30,30,45,0.6)_0%,rgba(15,15,30,0.9)_100%)]"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjciIG51bU9jdGF2ZXM9IjEwIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIj48L2ZlVHVyYnVsZW5jZT48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ij48L3JlY3Q+PC9zdmc+')] opacity-20"></div>
+      </div>
+
+      <div className="flex flex-col min-h-screen relative z-10">
         {/* Hero Section - stacked vertically and left-aligned */}
-        <div className="flex-shrink-0 flex justify-between items-start">
-          <div>
+        <div className="flex-shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center mb-4 py-4 px-2">
+          <div className="mb-4 md:mb-0">
             <TypingAnimation 
-              className="text-3xl font-bold"
+              className="text-5xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent"
             >
               GodCRM
             </TypingAnimation>
             <AnimatedShinyText 
-              className="block text-base text-muted-foreground mt-1 text-left w-full max-w-none mx-0"
+              className="block text-xl text-white/70 mt-2 text-left w-full max-w-none mx-0"
               shimmerWidth={100}
             >
               Your creative agency management solution
             </AnimatedShinyText>
           </div>
-          <div className="flex gap-4">
+          <div className="flex gap-6">
             <button 
               onClick={() => router.push('/clients')}
-              className="text-base text-violet-400 hover:text-violet-300 focus:outline-none focus:underline focus:underline-offset-2 focus:underline-violet-300 border-b border-violet-400/30 hover:border-violet-400 pb-1 transition-all"
+              className="text-lg text-white/80 hover:text-white focus:outline-none border-b border-white/30 hover:border-white pb-1 transition-all cursor-pointer"
             >
               Manage Clients
             </button>
             <button 
               onClick={() => router.push('/assets')}
-              className="text-base text-violet-400 hover:text-violet-300 focus:outline-none focus:underline focus:underline-offset-2 focus:underline-violet-300 border-b border-violet-400/30 hover:border-violet-400 pb-1 transition-all"
+              className="text-lg text-white/80 hover:text-white focus:outline-none border-b border-white/30 hover:border-white pb-1 transition-all cursor-pointer"
             >
               View Assets
             </button>
           </div>
         </div>
 
-        {/* KPI Cards - updated to 5 cards with glassmorphism */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 my-4 flex-shrink-0">
+        {/* KPI Cards - updated to 5 cards with enhanced glassmorphism */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 my-4 flex-shrink-0 animate-fadeInUp">
           {kpiData.map((kpi: KpiItem, index: number) => (
-            <Card key={index} className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 to-purple-500"></div>
-              <CardHeader className="pb-2 pt-3">
+            <Card 
+              key={index} 
+              className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:border-white/20"
+              style={{ animationDelay: `${index * 80}ms` }}
+            >
+              <CardHeader className="pb-3 pt-4">
                 <div className="flex items-center">
-                  <div className="mr-2 text-primary">
+                  <div className="mr-3 text-white p-2.5 bg-white/10 rounded-xl">
                     {kpi.icon}
                   </div>
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                  <CardTitle className="text-base font-medium text-white/80">
                     {kpi.title}
                   </CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="pb-3">
-                <div className="text-2xl font-bold">{kpi.value}</div>
-                <p className="text-sm text-muted-foreground mt-1">{kpi.change}</p>
+              <CardContent className="pb-4">
+                <div className="text-4xl font-bold mb-2 text-white">
+                  {kpi.title === 'Revenue' ? (
+                    <AnimatedCurrency value={kpi.numericValue} duration={1200} />
+                  ) : (
+                    <AnimatedNumber value={kpi.numericValue} duration={1200} />
+                  )}
+                </div>
+                <p className="text-sm text-white/70">{kpi.change}</p>
               </CardContent>
             </Card>
           ))}
         </div>
 
         {/* Main Content - Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 flex-grow min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 flex-grow min-h-0 mb-6">
           {/* Left Column - Larger */}
-          <div className="lg:col-span-3 space-y-3 flex flex-col">
-            {/* Revenue Trend Chart - Now Taller */}
-            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-grow flex flex-col">
-              <CardHeader className="pb-2 pt-3">
-                <CardTitle className="text-lg font-semibold">
+          <div className="lg:col-span-3 space-y-5 flex flex-col">
+            {/* Revenue Trend Chart - Now shorter */}
+            <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg flex-grow flex flex-col transition-all duration-300 hover:shadow-xl hover:border-white/20 animate-fadeInUp">
+              <CardHeader className="pb-4 pt-5">
+                <CardTitle className="text-2xl font-semibold text-white">
                   Revenue Trend
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pb-3 flex-grow flex flex-col">
-                <div className="flex-grow min-h-[350px]">
+              <CardContent className="pb-4 flex-grow flex flex-col">
+                <div className="flex-grow min-h-[100px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--primary)/0.2)" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
                       <XAxis 
                         dataKey="name" 
-                        stroke="#8b5cf6" 
-                        tick={{ fill: '#8b5cf6', fontSize: 14 }}
+                        stroke="#ffffff" 
+                        tick={{ fill: '#ffffff', fontSize: 14 }}
+                        tickLine={false}
+                        axisLine={false}
                       />
                       <YAxis 
-                        stroke="#8b5cf6" 
-                        tick={{ fill: '#8b5cf6', fontSize: 14 }}
+                        stroke="#ffffff" 
+                        tick={{ fill: '#ffffff', fontSize: 14 }}
                         tickFormatter={(value) => `$${value / 1000}k`}
                         domain={[0, 10000]}
+                        tickLine={false}
+                        axisLine={false}
                       />
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: 'hsl(var(--background)/0.8)', 
-                          backdropFilter: 'blur(10px)',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: 'var(--radius)',
-                          color: 'hsl(var(--foreground))'
+                          backgroundColor: 'rgba(30, 30, 40, 0.8)', 
+                          backdropFilter: 'blur(12px)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: '12px',
+                          color: '#ffffff',
+                          boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
                         }}
-                        formatter={(value) => [`$${value.toLocaleString()}`, 'Revenue']}
+                        formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Revenue']}
                         labelFormatter={(label) => `Month: ${label}`}
+                        itemStyle={{ color: '#ffffff' }}
                       />
                       <Area 
                         type="monotone" 
                         dataKey="revenue" 
-                        stroke="#8b5cf6" 
+                        stroke="#ffffff" 
                         fill="url(#colorRevenueViolet)" 
-                        fillOpacity={0.3}
+                        fillOpacity={0.15}
+                        strokeWidth={3}
+                        animationDuration={1000}
+                        animationEasing="ease-out"
                       />
                       <Line 
                         type="monotone" 
                         dataKey="revenue" 
-                        stroke="#8b5cf6" 
-                        strokeWidth={2}
-                        dot={{ r: 4, fill: '#8b5cf6', stroke: '#fff', strokeWidth: 2 }}
-                        activeDot={{ r: 6, fill: '#8b5cf6', stroke: '#fff', strokeWidth: 2 }}
+                        stroke="#ffffff" 
+                        strokeWidth={3}
+                        dot={{ r: 4, fill: '#ffffff', stroke: 'rgba(0,0,0,0.2)', strokeWidth: 2 }}
+                        activeDot={{ r: 6, fill: '#ffffff', stroke: 'rgba(0,0,0,0.2)', strokeWidth: 2 }}
+                        animationDuration={1000}
+                        animationEasing="ease-out"
                       />
                       <defs>
                         <linearGradient id="colorRevenueViolet" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                          <stop offset="5%" stopColor="#ffffff" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#ffffff" stopOpacity={0.05}/>
                         </linearGradient>
                       </defs>
                     </AreaChart>
@@ -356,37 +508,37 @@ export default function DashboardPage() {
             </Card>
 
             {/* Latest Clients - Now Shorter */}
-            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-shrink-0">
-              <CardHeader className="pb-2 pt-3">
-                <CardTitle className="text-lg font-semibold">
+            <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg flex-shrink-0 transition-all duration-300 hover:shadow-xl hover:border-white/20 animate-fadeInUp">
+              <CardHeader className="pb-4 pt-5">
+                <CardTitle className="text-2xl font-semibold text-white">
                   Latest Clients
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pb-2">
-                <div className="h-[160px] overflow-y-auto custom-scrollbar">
-                  <div className="space-y-2">
+              <CardContent className="pb-4">
+                <div className="h-[180px] overflow-y-auto custom-scrollbar">
+                  <div className="space-y-3">
                     {latestClients.map((client) => (
-                      <div key={client.id} className="flex items-center p-2 rounded-lg bg-background/20 hover:bg-background/30 transition-all duration-200 border border-white/5">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mr-2">
-                          <TrendingUp className="h-4 w-4 text-primary" />
+                      <div key={client.id} className="flex items-center p-3 rounded-[18px] bg-white/5 hover:bg-white/10 transition-all duration-300 border border-white/5 hover:border-white/10">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-[12px] bg-white/10 flex items-center justify-center mr-3">
+                          <TrendingUp className="h-5 w-5 text-white" />
                         </div>
                         <div className="flex-grow">
-                          <h4 className="font-medium text-base">{client.name}</h4>
-                          <p className="text-sm text-muted-foreground">{client.company || 'No company'}</p>
+                          <h4 className="font-semibold text-white">{client.name}</h4>
+                          <p className="text-sm text-white/70">{client.company || 'No company'}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm">{client.email}</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-white">{client.email}</p>
+                          <p className="text-sm text-white/70">
                             {client.created_at ? new Date(client.created_at).toLocaleDateString('en-US') : ''}
                           </p>
                         </div>
-                        <div className="ml-2 text-muted-foreground">
-                          <ChevronRight className="h-3 w-3" />
+                        <div className="ml-3 text-white/70">
+                          <ChevronRight className="h-4 w-4" />
                         </div>
                       </div>
                     ))}
                     {latestClients.length === 0 && (
-                      <div className="text-center py-4 text-muted-foreground">
+                      <div className="text-center py-6 text-white/70">
                         No clients found
                       </div>
                     )}
@@ -397,77 +549,77 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Column - Slimmer */}
-          <div className="lg:col-span-1 space-y-3 flex flex-col">
+          <div className="lg:col-span-1 space-y-5 flex flex-col">
             {/* Client Analytics & Allocation Panel */}
-            <Card className="bg-card/30 backdrop-blur-lg border border-white/10 rounded-xl shadow-lg flex-grow flex flex-col">
-              <CardHeader className="pb-2 pt-3 flex-shrink-0">
-                <CardTitle className="text-lg font-semibold flex items-center">
-                  <Target className="mr-2 h-5 w-5" />
+            <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg flex-grow flex flex-col transition-all duration-300 hover:shadow-xl hover:border-white/20 animate-fadeInUp">
+              <CardHeader className="pb-4 pt-5 flex-shrink-0">
+                <CardTitle className="text-2xl font-semibold flex items-center text-white">
+                  <Target className="mr-2 h-6 w-6" />
                   Client Analytics & Allocation
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pb-3 flex-grow flex flex-col">
+              <CardContent className="pb-4 flex-grow flex flex-col">
                 {/* Top Summary Row */}
-                <div className="mb-4">
+                <div className="mb-5">
                   {/* Top Client */}
-                  <div className="flex items-center justify-between mb-3 p-2 rounded-lg bg-background/20">
+                  <div className="flex items-center justify-between mb-4 p-3 rounded-[18px] bg-white/5">
                     <div className="flex items-center">
-                      <Trophy className="h-5 w-5 text-yellow-500 mr-2" />
-                      <span className="font-medium">Top Client:</span>
+                      <Trophy className="h-6 w-6 text-yellow-400 mr-3" />
+                      <span className="font-medium text-white">Top Client:</span>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium">{topClient?.name || 'N/A'}</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="font-semibold text-white">{topClient?.name || 'N/A'}</div>
+                      <div className="text-sm text-white/70">
                         {topClient ? `$${topClient.revenue.toLocaleString()}` : '$0'}
                       </div>
                     </div>
                   </div>
                   
                   {/* Top 3 Clients */}
-                  <div className="mb-3">
-                    <div className="text-sm font-medium mb-1">Top 3 Clients:</div>
-                    <div className="space-y-1">
+                  <div className="mb-4">
+                    <div className="text-base font-medium mb-2 text-white">Top 3 Clients:</div>
+                    <div className="space-y-2">
                       {top3Clients.map((client, index) => (
-                        <div key={client.id} className="flex items-center justify-between text-sm p-1 rounded">
+                        <div key={client.id} className="flex items-center justify-between text-sm p-2 rounded-xl">
                           <div className="flex items-center">
-                            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold mr-2 ${
-                              index === 0 ? 'bg-yellow-500 text-black' : 
-                              index === 1 ? 'bg-gray-400 text-black' : 
-                              'bg-amber-800 text-white'
+                            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 ${
+                              index === 0 ? 'bg-yellow-400 text-black' : 
+                              index === 1 ? 'bg-gray-300 text-black' : 
+                              'bg-amber-700 text-white'
                             }`}>
                               {index + 1}
                             </span>
-                            <span className="truncate max-w-[80px]">{client.name}</span>
+                            <span className="truncate max-w-[90px] font-medium text-white">{client.name}</span>
                           </div>
-                          <span className="text-muted-foreground">${(client.revenue / 1000).toFixed(1)}k</span>
+                          <span className="text-white/70">${(client.revenue / 1000).toFixed(1)}k</span>
                         </div>
                       ))}
                     </div>
                   </div>
                   
                   {/* Total Revenue */}
-                  <div className="flex items-center justify-between p-2 rounded-lg bg-background/20">
-                    <span className="font-medium">Total Revenue:</span>
-                    <span className="font-bold text-lg text-primary">${(totalRevenue / 1000).toFixed(1)}k</span>
+                  <div className="flex items-center justify-between p-3 rounded-[18px] bg-white/5">
+                    <span className="font-medium text-white">Total Revenue:</span>
+                    <span className="font-bold text-xl text-white">$<AnimatedNumber value={totalRevenue / 1000} prefix="" duration={1200} />k</span>
                   </div>
                 </div>
                 
                 {/* Client Revenue List */}
-                <div className="flex-grow mb-4">
-                  <div className="text-sm font-medium mb-1">All Clients:</div>
-                  <div className="h-[120px] overflow-y-auto custom-scrollbar">
-                    <div className="space-y-1">
+                <div className="flex-grow mb-5">
+                  <div className="text-base font-medium mb-2 text-white">All Clients:</div>
+                  <div className="h-[140px] overflow-y-auto custom-scrollbar">
+                    <div className="space-y-2">
                       {clientsWithRevenue.map((client) => (
                         <div 
                           key={client.id} 
-                          className="flex items-center justify-between text-sm p-1 rounded cursor-pointer hover:bg-background/30 transition-colors"
+                          className="flex items-center justify-between text-sm p-2 rounded-xl cursor-pointer hover:bg-white/10 transition-colors"
                           onClick={() => router.push(`/clients/${client.id}`)}
                         >
                           <div className="flex items-center">
-                            <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: `hsl(${client.revenue % 360}, 70%, 60%)` }}></div>
-                            <span className="truncate max-w-[90px]">{client.name}</span>
+                            <div className="w-2.5 h-2.5 rounded-full mr-3" style={{ backgroundColor: `hsl(${client.revenue % 360}, 70%, 60%)` }}></div>
+                            <span className="truncate max-w-[100px] text-white">{client.name}</span>
                           </div>
-                          <span className="text-muted-foreground">${(client.revenue / 1000).toFixed(1)}k</span>
+                          <span className="text-white/70">${(client.revenue / 1000).toFixed(1)}k</span>
                         </div>
                       ))}
                     </div>
@@ -475,49 +627,49 @@ export default function DashboardPage() {
                 </div>
                 
                 {/* Suggested Actions & Hiring Allocation */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {/* Suggested Hire */}
-                  <div className="p-2 rounded-lg bg-background/20">
-                    <div className="text-sm font-medium mb-1">Suggested Hire:</div>
-                    <div className="text-primary font-medium">Hire: {suggestedHire}</div>
+                  <div className="p-3 rounded-[18px] bg-white/5">
+                    <div className="text-base font-medium mb-1 text-white">Suggested Hire:</div>
+                    <div className="text-white font-semibold">Hire: {suggestedHire}</div>
                   </div>
                   
                   {/* Allocation Split */}
                   <div>
-                    <div className="text-sm font-medium mb-1">Recommended Allocation:</div>
-                    <div className="grid grid-cols-2 gap-1 text-xs">
-                      <div className="p-1 rounded bg-background/20">
+                    <div className="text-base font-medium mb-2 text-white">Recommended Allocation:</div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="p-2 rounded-xl bg-white/5">
                         <div>Operations</div>
-                        <div className="font-medium">{allocation.operations.percentage}% (${(allocation.operations.amount / 1000).toFixed(1)}k)</div>
+                        <div className="font-semibold text-white">{allocation.operations.percentage}% ($<AnimatedNumber value={allocation.operations.amount / 1000} prefix="" duration={1200} />k)</div>
                       </div>
-                      <div className="p-1 rounded bg-background/20">
+                      <div className="p-2 rounded-xl bg-white/5">
                         <div>Payroll</div>
-                        <div className="font-medium">{allocation.payroll.percentage}% (${(allocation.payroll.amount / 1000).toFixed(1)}k)</div>
+                        <div className="font-semibold text-white">{allocation.payroll.percentage}% ($<AnimatedNumber value={allocation.payroll.amount / 1000} prefix="" duration={1200} />k)</div>
                       </div>
-                      <div className="p-1 rounded bg-background/20">
+                      <div className="p-2 rounded-xl bg-white/5">
                         <div>Growth/Ads</div>
-                        <div className="font-medium">{allocation.growth.percentage}% (${(allocation.growth.amount / 1000).toFixed(1)}k)</div>
+                        <div className="font-semibold text-white">{allocation.growth.percentage}% ($<AnimatedNumber value={allocation.growth.amount / 1000} prefix="" duration={1200} />k)</div>
                       </div>
-                      <div className="p-1 rounded bg-background/20">
+                      <div className="p-2 rounded-xl bg-white/5">
                         <div>Savings</div>
-                        <div className="font-medium">{allocation.savings.percentage}% (${(allocation.savings.amount / 1000).toFixed(1)}k)</div>
+                        <div className="font-semibold text-white">{allocation.savings.percentage}% ($<AnimatedNumber value={allocation.savings.amount / 1000} prefix="" duration={1200} />k)</div>
                       </div>
                     </div>
                   </div>
                   
                   {/* Time Estimate */}
-                  <div className="p-2 rounded-lg bg-background/20">
-                    <div className="text-sm font-medium mb-1">Time Estimate:</div>
-                    <div className="text-muted-foreground">Est. time for top client: {timeEstimate}</div>
+                  <div className="p-3 rounded-[18px] bg-white/5">
+                    <div className="text-base font-medium mb-1 text-white">Time Estimate:</div>
+                    <div className="text-white/70">Est. time for top client: {timeEstimate}</div>
                   </div>
                 </div>
                 
                 {/* Insights & Recommendations */}
-                <div className="mt-3 pt-3 border-t border-white/10">
-                  <div className="text-sm font-medium mb-2">Insights & Recommendations:</div>
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <div className="text-base font-medium mb-2 text-white">Insights & Recommendations:</div>
                   <div className="space-y-2">
                     {insights.map((insight, index) => (
-                      <div key={index} className="text-xs text-muted-foreground p-2 rounded bg-background/10">
+                      <div key={index} className="text-sm text-white/70 p-3 rounded-xl bg-white/5">
                         {insight}
                       </div>
                     ))}
@@ -540,12 +692,27 @@ export default function DashboardPage() {
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(180deg, #ec4899, #8b5cf6);
+          background: linear-gradient(180deg, #9b5cff, #8b5cf6);
           border-radius: 10px;
-          box-shadow: 0 0 4px rgba(147, 51, 234, 0.3);
+          box-shadow: 0 0 4px rgba(155, 92, 255, 0.5);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(180deg, #f97316, #ec4899);
+          background: linear-gradient(180deg, #8b5cf6, #9b5cff);
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fadeInUp {
+          animation: fadeInUp 0.6s ease-out forwards;
         }
       `}</style>
     </DashboardLayout>

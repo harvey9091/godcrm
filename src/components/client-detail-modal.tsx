@@ -21,6 +21,7 @@ import {
 } from '@tabler/icons-react'
 import { Client } from '@/lib/types'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 interface ClientDetailModalProps {
   client: Client | null
@@ -92,9 +93,9 @@ export function ClientDetailModal({ client, open, onClose, onEdit }: ClientDetai
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent 
-        className="!w-[80vw] !max-w-[1600px] !min-w-[70vw] h-[85vh] rounded-2xl overflow-hidden shadow-2xl backdrop-blur-lg bg-card/40 border border-white/10 p-0"
+        className="!w-[80vw] !max-w-[1600px] !min-w-[70vw] h-[85vh] rounded-[18px] overflow-hidden shadow-2xl backdrop-blur-[20px] bg-white/10 border border-white/15 p-0 transition-all duration-300"
         style={{
-          animation: open ? 'modalEnter 250ms ease-out' : 'modalExit 250ms ease-in'
+          animation: open ? 'modalEnter 300ms cubic-bezier(0.34, 1.56, 0.64, 1)' : 'modalExit 200ms ease-in'
         }}
       >
         {/* Hidden dialog title for accessibility */}
@@ -122,31 +123,33 @@ export function ClientDetailModal({ client, open, onClose, onEdit }: ClientDetai
             }
           }
           .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
           }
           .custom-scrollbar::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
           }
           .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(139, 92, 246, 0.5);
-            border-radius: 4px;
+            background: linear-gradient(180deg, #9b5cff, #8b5cf6);
+            border-radius: 10px;
+            box-shadow: 0 0 4px rgba(155, 92, 255, 0.5);
           }
           .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(139, 92, 246, 0.7);
+            background: linear-gradient(180deg, #8b5cf6, #9b5cff);
           }
         `}</style>
         
         {/* Custom Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
+          className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 z-10 backdrop-blur-sm border border-white/10"
         >
           <IconX className="w-5 h-5 text-white" />
         </button>
         
         <div className="flex flex-col h-full">
           {/* Hero Section - Full Width Header */}
-          <div className="bg-gradient-to-r from-violet-900/30 to-purple-900/30 p-8 border-b border-white/10 backdrop-blur-sm flex-shrink-0">
+          <div className="bg-gradient-to-r from-violet-900/20 to-purple-900/20 p-8 border-b border-white/10 backdrop-blur-sm flex-shrink-0">
             <div className="flex flex-col md:flex-row gap-8 items-center">
               <div className="flex-shrink-0">
                 {loading ? (
@@ -154,9 +157,11 @@ export function ClientDetailModal({ client, open, onClose, onEdit }: ClientDetai
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-violet-400"></div>
                   </div>
                 ) : youtubeData?.thumbnail_url ? (
-                  <img 
+                  <Image 
                     src={youtubeData.thumbnail_url} 
                     alt="Channel thumbnail" 
+                    width={128}
+                    height={128}
                     className="w-32 h-32 rounded-full object-cover border-2 border-violet-400/30"
                   />
                 ) : (
@@ -172,7 +177,7 @@ export function ClientDetailModal({ client, open, onClose, onEdit }: ClientDetai
                   {onEdit && (
                     <Button 
                       onClick={() => onEdit(client)}
-                      className="bg-violet-600 hover:bg-violet-700 text-white flex items-center gap-2"
+                      className="bg-violet-600 hover:bg-violet-700 text-white flex items-center gap-2 rounded-[12px] transition-all duration-300 hover:scale-[1.02]"
                     >
                       <IconEdit className="w-4 h-4" />
                       Edit Client
@@ -198,344 +203,241 @@ export function ClientDetailModal({ client, open, onClose, onEdit }: ClientDetai
                     <div className="flex flex-wrap items-center gap-6 justify-center md:justify-start">
                       <div className="flex items-center gap-2">
                         <IconUsers className="w-5 h-5 text-violet-400" />
-                        <span className="text-white/90 text-lg">
-                          {youtubeData.subscriber_count || 'N/A'} subscribers
+                        <span className="text-white/80">
+                          {youtubeData.subscriber_count ? `${youtubeData.subscriber_count} subscribers` : 'Subscriber count unavailable'}
                         </span>
                       </div>
                       <a 
-                        href={client.youtube || '#'} 
+                        href={youtubeData.author_url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-violet-300 hover:text-violet-200 flex items-center gap-2 text-lg transition-colors"
+                        className="text-violet-400 hover:text-violet-300 flex items-center gap-1"
                       >
                         <IconBrandYoutube className="w-5 h-5" />
-                        <span>View Channel</span>
+                        Visit Channel
                       </a>
                     </div>
-                    
-                    {youtubeData.description && (
-                      <p className="text-white/80 text-base leading-relaxed">
-                        {youtubeData.description}
-                      </p>
-                    )}
+                    <h2 className="text-xl font-semibold text-white">{youtubeData.title}</h2>
+                    <p className="text-white/80 line-clamp-3">{youtubeData.description}</p>
                   </div>
                 ) : (
-                  <p className="text-white/70 text-lg">No YouTube channel linked</p>
+                  <div className="space-y-3 max-w-2xl">
+                    <div className="flex items-center gap-3">
+                      <IconMail className="w-5 h-5 text-violet-400 flex-shrink-0" />
+                      <span className="text-white/80">{client.email || 'No email provided'}</span>
+                    </div>
+                    {client.company && (
+                      <div className="flex items-center gap-3">
+                        <IconUsers className="w-5 h-5 text-violet-400 flex-shrink-0" />
+                        <span className="text-white/80">{client.company}</span>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
           </div>
           
-          {/* Scrollable Content Area */}
-          <div className="overflow-y-auto custom-scrollbar pr-2 flex-grow p-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Client Information */}
-              <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                  <IconUser className="w-5 h-5 text-violet-400" />
-                  Client Information
-                </h2>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Name</p>
-                      <p className="font-medium text-white text-base">{client.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Email</p>
-                      <p className="font-medium text-white text-base">{client.email}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Company</p>
-                      <p className="font-medium text-white text-base">{client.company || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Primary Contact</p>
-                      <p className="font-medium text-white text-base">{client.primary_contact || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Website</p>
-                      <p className="font-medium text-white text-base">
-                        {client.website ? (
-                          <a href={client.website} target="_blank" rel="noopener noreferrer" className="text-violet-300 hover:text-violet-200 hover:underline">
-                            {client.website}
-                          </a>
-                        ) : 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Status</p>
-                      <p className="font-medium text-white text-base capitalize">{client.status}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Social Links */}
-              <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                <h2 className="text-xl font-semibold text-white mb-4">Social Links</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {client.website ? (
-                    <a 
-                      href={client.website} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-3 p-4 bg-violet-900/20 rounded-xl hover:bg-violet-900/30 hover:scale-105 transition-all duration-200 group"
-                    >
-                      <IconLink className="w-8 h-8 text-violet-400 group-hover:text-violet-300" />
-                      <span className="text-sm text-white/80 text-center">Website</span>
-                    </a>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-xl">
-                      <IconLink className="w-8 h-8 text-white/30" />
-                      <span className="text-sm text-white/50 text-center">Website</span>
-                    </div>
-                  )}
-                  
-                  {client.youtube ? (
-                    <a 
-                      href={client.youtube} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-3 p-4 bg-red-900/20 rounded-xl hover:bg-red-900/30 hover:scale-105 transition-all duration-200 group"
-                    >
-                      <IconBrandYoutube className="w-8 h-8 text-red-500 group-hover:text-red-400" />
-                      <span className="text-sm text-white/80 text-center">YouTube</span>
-                    </a>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-xl">
-                      <IconBrandYoutube className="w-8 h-8 text-white/30" />
-                      <span className="text-sm text-white/50 text-center">YouTube</span>
-                    </div>
-                  )}
-                  
-                  {client.twitter ? (
-                    <a 
-                      href={client.twitter} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-3 p-4 bg-blue-900/20 rounded-xl hover:bg-blue-900/30 hover:scale-105 transition-all duration-200 group"
-                    >
-                      <IconBrandTwitter className="w-8 h-8 text-blue-400 group-hover:text-blue-300" />
-                      <span className="text-sm text-white/80 text-center">Twitter</span>
-                    </a>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-xl">
-                      <IconBrandTwitter className="w-8 h-8 text-white/30" />
-                      <span className="text-sm text-white/50 text-center">Twitter</span>
-                    </div>
-                  )}
-                  
-                  {client.instagram ? (
-                    <a 
-                      href={client.instagram} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-3 p-4 bg-pink-900/20 rounded-xl hover:bg-pink-900/30 hover:scale-105 transition-all duration-200 group"
-                    >
-                      <IconBrandInstagram className="w-8 h-8 text-pink-500 group-hover:text-pink-400" />
-                      <span className="text-sm text-white/80 text-center">Instagram</span>
-                    </a>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-xl">
-                      <IconBrandInstagram className="w-8 h-8 text-white/30" />
-                      <span className="text-sm text-white/50 text-center">Instagram</span>
-                    </div>
-                  )}
-                  
-                  {client.linkedin ? (
-                    <a 
-                      href={client.linkedin} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-3 p-4 bg-blue-900/20 rounded-xl hover:bg-blue-900/30 hover:scale-105 transition-all duration-200 group"
-                    >
-                      <IconBrandLinkedin className="w-8 h-8 text-blue-500 group-hover:text-blue-400" />
-                      <span className="text-sm text-white/80 text-center">LinkedIn</span>
-                    </a>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-xl">
-                      <IconBrandLinkedin className="w-8 h-8 text-white/30" />
-                      <span className="text-sm text-white/50 text-center">LinkedIn</span>
-                    </div>
-                  )}
-                  
-                  {client.tiktok ? (
-                    <a 
-                      href={client.tiktok} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-3 p-4 bg-gray-900/20 rounded-xl hover:bg-gray-900/30 hover:scale-105 transition-all duration-200 group"
-                    >
-                      <IconBrandTiktok className="w-8 h-8 text-white group-hover:text-gray-300" />
-                      <span className="text-sm text-white/80 text-center">TikTok</span>
-                    </a>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3 p-4 bg-white/5 rounded-xl">
-                      <IconBrandTiktok className="w-8 h-8 text-white/30" />
-                      <span className="text-sm text-white/50 text-center">TikTok</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {/* Outreach Information */}
-              <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                  <IconMail className="w-5 h-5 text-violet-400" />
-                  Outreach Information
-                </h2>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Outreach Type</p>
-                      <p className="font-medium text-white text-base">{client.outreach_type || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Outreach Platform</p>
-                      <p className="font-medium text-white text-base">{client.outreach_platform || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Outreach Date</p>
-                      <p className="font-medium text-white text-base">
-                        {client.outreach_date ? new Date(client.outreach_date).toLocaleDateString() : 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">First Outreach Date</p>
-                      <p className="font-medium text-white text-base">
-                        {client.first_outreach_date ? new Date(client.first_outreach_date).toLocaleDateString() : 'N/A'}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <p className="text-sm text-white/60 mb-1">Outreach Link Sent</p>
-                    <p className="font-medium text-white text-base">{client.outreach_link_sent || 'N/A'}</p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-sm text-white/60 mb-1">Outreach Notes</p>
-                    <p className="font-medium text-white text-base">{client.outreach_notes || 'N/A'}</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Follow-up Information */}
-              <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                  <IconCalendar className="w-5 h-5 text-violet-400" />
-                  Follow-up Information
-                </h2>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Lead Temperature</p>
-                      <p className="font-medium text-white text-base capitalize">{client.lead_temp}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Did They Reply?</p>
-                      <p className="font-medium text-white text-base">{client.did_reply || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Follow-up Status</p>
-                      <p className="font-medium text-white text-base">{client.follow_up_status || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Follow-up Count</p>
-                      <p className="font-medium text-white text-base">{client.follow_up_count || 0}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Platforms Followed Up On</p>
-                      <p className="font-medium text-white text-base">{client.platforms_followed_up_on || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/60 mb-1">Next Follow-up Date</p>
-                      <p className="font-medium text-white text-base">
-                        {client.next_follow_up_date ? new Date(client.next_follow_up_date).toLocaleDateString() : 'N/A'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Notes / Internal Info */}
-              {(client.notes || client.source || client.tags) && (
-                <div className="lg:col-span-2 bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+          {/* Main Content */}
+          <div className="flex-grow overflow-y-auto custom-scrollbar p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Column - Client Info */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Contact Information */}
+                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
                   <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <IconNotes className="w-5 h-5 text-violet-400" />
-                    Notes & Internal Information
+                    <IconMail className="w-5 h-5 text-violet-400" />
+                    Contact Information
                   </h2>
-                  <div className="space-y-6">
-                    {client.notes && (
-                      <div>
-                        <p className="text-sm text-white/60 mb-2 flex items-center gap-1">
-                          <IconNotes className="w-4 h-4" />
-                          Notes
-                        </p>
-                        <p className="font-medium text-white whitespace-pre-wrap bg-white/5 p-4 rounded-lg text-base leading-relaxed">
-                          {client.notes}
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {client.source && (
-                        <div>
-                          <p className="text-sm text-white/60 mb-2 flex items-center gap-1">
-                            <IconTag className="w-4 h-4" />
-                            Source
-                          </p>
-                          <p className="font-medium text-white bg-white/5 p-3 rounded-lg text-base">
-                            {client.source}
-                          </p>
-                        </div>
-                      )}
-                      
-                      {client.tags && (
-                        <div>
-                          <p className="text-sm text-white/60 mb-2 flex items-center gap-1">
-                            <IconTag className="w-4 h-4" />
-                            Tags
-                          </p>
-                          <p className="font-medium text-white bg-white/5 p-3 rounded-lg text-base">
-                            {client.tags}
-                          </p>
-                        </div>
-                      )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-white/70">Email</label>
+                      <p className="text-white">{client.email || 'Not provided'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-white/70">Company</label>
+                      <p className="text-white">{client.company || 'Not provided'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-white/70">Primary Contact</label>
+                      <p className="text-white">{client.primary_contact || 'Not provided'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-white/70">Status</label>
+                      <p className="text-white capitalize">{client.status}</p>
                     </div>
                   </div>
                 </div>
-              )}
-              
-              {/* Stats */}
-              <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-                <h2 className="text-xl font-semibold text-white mb-4">Statistics</h2>
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="bg-white/5 p-4 rounded-xl">
-                    <p className="text-sm text-white/60 mb-1">Subscriber Count</p>
-                    <p className="font-bold text-xl text-white">
-                      {client.subscriber_count ? client.subscriber_count.toLocaleString() : 'N/A'}
-                    </p>
-                  </div>
-                  <div className="bg-white/5 p-4 rounded-xl">
-                    <p className="text-sm text-white/60 mb-1">Created At</p>
-                    <p className="font-bold text-xl text-white">
-                      {client.created_at ? new Date(client.created_at).toLocaleDateString() : 'N/A'}
-                    </p>
-                  </div>
-                  <div className="bg-white/5 p-4 rounded-xl">
-                    <p className="text-sm text-white/60 mb-1">Lead Temp</p>
-                    <p className="font-bold text-xl text-white capitalize">{client.lead_temp}</p>
-                  </div>
-                  <div className="bg-white/5 p-4 rounded-xl">
-                    <p className="text-sm text-white/60 mb-1">Status</p>
-                    <p className="font-bold text-xl text-white capitalize">{client.status}</p>
+                
+                {/* Social Links */}
+                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
+                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                    <IconLink className="w-5 h-5 text-violet-400" />
+                    Social Links
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {client.website && (
+                      <a 
+                        href={client.website} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-3 rounded-[12px] bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300"
+                      >
+                        <IconLink className="w-5 h-5 text-violet-400" />
+                        <span className="text-white truncate">Website</span>
+                      </a>
+                    )}
+                    {client.youtube && (
+                      <a 
+                        href={client.youtube} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-3 rounded-[12px] bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300"
+                      >
+                        <IconBrandYoutube className="w-5 h-5 text-red-500" />
+                        <span className="text-white truncate">YouTube</span>
+                      </a>
+                    )}
+                    {client.instagram && (
+                      <a 
+                        href={client.instagram} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-3 rounded-[12px] bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300"
+                      >
+                        <IconBrandInstagram className="w-5 h-5 text-pink-500" />
+                        <span className="text-white truncate">Instagram</span>
+                      </a>
+                    )}
+                    {client.twitter && (
+                      <a 
+                        href={client.twitter} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-3 rounded-[12px] bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300"
+                      >
+                        <IconBrandTwitter className="w-5 h-5 text-blue-400" />
+                        <span className="text-white truncate">Twitter</span>
+                      </a>
+                    )}
+                    {client.linkedin && (
+                      <a 
+                        href={client.linkedin} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-3 rounded-[12px] bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300"
+                      >
+                        <IconBrandLinkedin className="w-5 h-5 text-blue-600" />
+                        <span className="text-white truncate">LinkedIn</span>
+                      </a>
+                    )}
+                    {client.tiktok && (
+                      <a 
+                        href={client.tiktok} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-3 rounded-[12px] bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300"
+                      >
+                        <IconBrandTiktok className="w-5 h-5 text-black dark:text-white" />
+                        <span className="text-white truncate">TikTok</span>
+                      </a>
+                    )}
                   </div>
                 </div>
+                
+                {/* Notes */}
+                {client.notes && (
+                  <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
+                    <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                      <IconNotes className="w-5 h-5 text-violet-400" />
+                      Notes
+                    </h2>
+                    <p className="text-white/80 whitespace-pre-wrap">{client.notes}</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Right Column - Outreach & Follow-up */}
+              <div className="space-y-6">
+                {/* Outreach Information */}
+                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
+                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                    <IconCalendar className="w-5 h-5 text-violet-400" />
+                    Outreach Information
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm text-white/70">Outreach Type</label>
+                      <p className="text-white">{client.outreach_type || 'Not specified'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-white/70">Outreach Date</label>
+                      <p className="text-white">
+                        {client.outreach_date 
+                          ? new Date(client.outreach_date).toLocaleDateString() 
+                          : 'Not scheduled'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-white/70">Lead Temperature</label>
+                      <p className="text-white capitalize">{client.lead_temp}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-white/70">Did Reply</label>
+                      <p className="text-white">{client.did_reply || 'No response yet'}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Follow-up Status */}
+                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
+                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                    <IconTag className="w-5 h-5 text-violet-400" />
+                    Follow-up Status
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm text-white/70">Status</label>
+                      <p className="text-white">{client.follow_up_status || 'Not started'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-white/70">Follow-up Count</label>
+                      <p className="text-white">{client.follow_up_count || 0}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-white/70">Next Follow-up Date</label>
+                      <p className="text-white">
+                        {client.next_follow_up_date 
+                          ? new Date(client.next_follow_up_date).toLocaleDateString() 
+                          : 'Not scheduled'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-white/70">Platforms Followed Up On</label>
+                      <p className="text-white">{client.platforms_followed_up_on || 'Not specified'}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tags */}
+                {client.tags && (
+                  <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
+                    <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                      <IconTag className="w-5 h-5 text-violet-400" />
+                      Tags
+                    </h2>
+                    <div className="flex flex-wrap gap-2">
+                      {client.tags.split(',').map((tag, index) => (
+                        <span 
+                          key={index} 
+                          className="px-3 py-1 bg-violet-900/30 text-violet-300 rounded-full text-sm border border-violet-500/30"
+                        >
+                          {tag.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

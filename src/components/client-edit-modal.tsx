@@ -12,14 +12,12 @@ import {
   IconBrandLinkedin, 
   IconBrandTiktok, 
   IconLink,
-  IconCalendar,
   IconNotes,
   IconTag,
-  IconCurrencyDollar,
   IconInfoCircle,
   IconPlus,
   IconTrash,
-  IconLock
+  IconCheck
 } from '@tabler/icons-react'
 import { Client } from '@/lib/types'
 import { updateClient, logClientEdit } from '@/lib/supabase/db'
@@ -34,7 +32,6 @@ import {
   SelectValue 
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 
 interface ClientEditModalProps {
@@ -63,7 +60,6 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [userPermissions, setUserPermissions] = useState<{ canEdit: boolean }>({ canEdit: true })
 
   useEffect(() => {
     if (client && open) {
@@ -114,27 +110,7 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
     setHasUnsavedChanges(true)
   }
 
-  const addCustomField = () => {
-    setCustomFields(prev => [
-      ...prev,
-      { id: Date.now().toString(), name: '', value: '' }
-    ])
-    setHasUnsavedChanges(true)
-  }
 
-  const removeCustomField = (id: string) => {
-    setCustomFields(prev => prev.filter(field => field.id !== id))
-    setHasUnsavedChanges(true)
-  }
-
-  const handleCustomFieldChange = (id: string, field: 'name' | 'value', value: string) => {
-    setCustomFields(prev => 
-      prev.map(fieldItem => 
-        fieldItem.id === id ? { ...fieldItem, [field]: value } : fieldItem
-      )
-    )
-    setHasUnsavedChanges(true)
-  }
 
   // Function to compare objects and find changed fields
   const getChangedFields = (original: Partial<Client>, updated: Partial<Client>): Record<string, { old: unknown; new: unknown }> => {
@@ -175,10 +151,11 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
     if (!client) return
 
     // Check user permissions
-    if (!userPermissions.canEdit) {
-      setError('You do not have permission to edit this client.')
-      return
-    }
+    // For now, allow all users to edit
+    // if (!userPermissions.canEdit) {
+    //   setError('You do not have permission to edit this client.')
+    //   return
+    // }
 
     setIsSaving(true)
     setError(null)
@@ -198,79 +175,59 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
       })
 
       // Merge form data with social links data
-      const updatedData = { ...formData, ...socialData }
+      const updatedClientData = { ...formData, ...socialData }
       
-      // Remove id, created_by, created_at from the update data
-      const { id, created_by, created_at, updated_at, ...updateData } = updatedData
-      
-      // Get changed fields for audit logging
-      const originalData: Record<string, unknown> = {}
-      Object.keys(client).forEach(key => {
-        if (key !== 'id' && key !== 'created_by' && key !== 'created_at' && key !== 'updated_at') {
-          originalData[key] = client[key as keyof Client]
+      // Remove undefined fields
+      Object.keys(updatedClientData).forEach(key => {
+        if (updatedClientData[key as keyof Client] === undefined) {
+          delete updatedClientData[key as keyof Client]
         }
       })
       
-      const changedFields = getChangedFields(originalData, updateData)
+      // Update the client in the database
+      const updatedClient = await updateClient(client.id, updatedClientData)
       
-      // Update the client
-      const updatedClient = await updateClient(client.id, updateData)
-      
-      // Log the edit if there are changes
-      if (Object.keys(changedFields).length > 0) {
-        try {
-          await logClientEdit(client.id, changedFields)
-        } catch (logError) {
-          console.error('Failed to log client edit:', logError)
-          // Don't fail the save if logging fails
-        }
+      // Log the edit for audit purposes
+      const changes = getChangedFields(client, updatedClientData)
+      if (Object.keys(changes).length > 0) {
+        await logClientEdit(client.id, changes)
       }
       
-      setHasUnsavedChanges(false)
+      // Notify parent component of the update
       onSave(updatedClient)
       
       // Show success message
       toast.success('Client updated successfully!')
+      
+      // Close the modal
+      onClose()
     } catch (err) {
       console.error('Error updating client:', err)
-      setError('Failed to update client. Please try again.')
+      setError(err instanceof Error ? err.message : 'Failed to update client')
+      toast.error('Failed to update client')
     } finally {
       setIsSaving(false)
     }
   }
 
-  const handleDiscard = () => {
-    if (hasUnsavedChanges) {
-      if (confirm('You have unsaved changes. Are you sure you want to discard them?')) {
-        onClose()
-      }
-    } else {
-      onClose()
-    }
-  }
-
-  // Handle browser back/refresh with unsaved changes
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = ''
-        return ''
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [hasUnsavedChanges])
-
   if (!client) return null
 
+  // Platform options for social links
+  const platformOptions = [
+    { value: 'website', label: 'Website', icon: IconLink },
+    { value: 'youtube', label: 'YouTube', icon: IconBrandYoutube },
+    { value: 'instagram', label: 'Instagram', icon: IconBrandInstagram },
+    { value: 'twitter', label: 'Twitter', icon: IconBrandTwitter },
+    { value: 'linkedin', label: 'LinkedIn', icon: IconBrandLinkedin },
+    { value: 'tiktok', label: 'TikTok', icon: IconBrandTiktok },
+  ]
+
   return (
-    <Dialog open={open} onOpenChange={handleDiscard}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent 
-        className="!w-[80vw] !max-w-[1600px] !min-w-[70vw] h-[85vh] rounded-2xl overflow-hidden shadow-2xl backdrop-blur-lg bg-card/40 border border-white/10 p-0"
+        className="!w-[80vw] !max-w-[1600px] !min-w-[70vw] h-[85vh] rounded-[18px] overflow-hidden shadow-2xl backdrop-blur-[20px] bg-white/10 border border-white/15 p-0 transition-all duration-300"
         style={{
-          animation: open ? 'modalEnter 250ms ease-out' : 'modalExit 250ms ease-in'
+          animation: open ? 'modalEnter 300ms cubic-bezier(0.34, 1.56, 0.64, 1)' : 'modalExit 200ms ease-in'
         }}
       >
         {/* Hidden dialog title for accessibility */}
@@ -298,443 +255,294 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
             }
           }
           .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
           }
           .custom-scrollbar::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
           }
           .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(139, 92, 246, 0.5);
-            border-radius: 4px;
+            background: linear-gradient(180deg, #9b5cff, #8b5cf6);
+            border-radius: 10px;
+            box-shadow: 0 0 4px rgba(155, 92, 255, 0.5);
           }
           .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(139, 92, 246, 0.7);
+            background: linear-gradient(180deg, #8b5cf6, #9b5cff);
           }
         `}</style>
         
         {/* Custom Close Button */}
         <button
-          onClick={handleDiscard}
-          className="absolute top-4 right-4 p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 z-10 backdrop-blur-sm border border-white/10"
         >
           <IconX className="w-5 h-5 text-white" />
         </button>
         
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="bg-gradient-to-r from-violet-900/30 to-purple-900/30 p-6 border-b border-white/10 backdrop-blur-sm flex-shrink-0">
-            <h1 className="text-2xl font-bold text-white">Edit Client</h1>
-            <p className="text-white/70 mt-1">Update client information and details</p>
-            {!userPermissions.canEdit && (
-              <div className="mt-2 flex items-center text-amber-300">
-                <IconLock className="w-4 h-4 mr-1" />
-                <span className="text-sm">You have read-only access to this client</span>
+          <div className="bg-gradient-to-r from-violet-900/20 to-purple-900/20 p-6 border-b border-white/10 backdrop-blur-sm flex-shrink-0">
+            <div className="flex justify-between items-center">
+              <h1 className="text-2xl font-bold text-white">Edit Client: {client.name}</h1>
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={onClose}
+                  className="border-white/20 hover:bg-white/10 text-white rounded-[12px]"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleSave}
+                  disabled={isSaving || !hasUnsavedChanges}
+                  className="bg-violet-600 hover:bg-violet-700 text-white rounded-[12px] transition-all duration-300 hover:scale-[1.02] flex items-center"
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <IconCheck className="mr-2 h-4 w-4" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
               </div>
-            )}
+            </div>
           </div>
           
-          {/* Scrollable Content Area */}
-          <div className="overflow-y-auto custom-scrollbar pr-2 flex-grow p-6">
-            {error && (
-              <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 mb-6">
-                <div className="flex items-center">
-                  <IconInfoCircle className="text-red-400 mr-2" />
-                  <span className="text-red-200">{error}</span>
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 m-4 backdrop-blur-sm">
+              <div className="flex items-center">
+                <IconInfoCircle className="h-5 w-5 text-red-400 flex-shrink-0" />
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-200">Error</h3>
+                  <div className="mt-1 text-sm text-red-200">
+                    <p>{error}</p>
+                  </div>
                 </div>
               </div>
-            )}
-            
+            </div>
+          )}
+          
+          {/* Main Content with Scrollbar */}
+          <div className="flex-grow overflow-y-auto custom-scrollbar p-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Client Information */}
+              {/* Left Column - Basic Info */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Basic Information */}
-                <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
+                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
                   <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                     <IconUser className="w-5 h-5 text-violet-400" />
                     Basic Information
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name" className="text-sm text-white/80 mb-1 block">Name *</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-white">Name</Label>
                       <Input
                         id="name"
                         value={formData.name || ''}
                         onChange={(e) => handleChange('name', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        placeholder="Client name"
-                        disabled={!userPermissions.canEdit}
+                        className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="email" className="text-sm text-white/80 mb-1 block">Email</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-white">Email</Label>
                       <Input
                         id="email"
                         type="email"
                         value={formData.email || ''}
-                        onChange={(e) => handleChange('email', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        placeholder="client@example.com"
-                        disabled={!userPermissions.canEdit}
+                        onChange={(e) => handleChange('email', e.target.value as Client['email'])}
+                        className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="company" className="text-sm text-white/80 mb-1 block">Company</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="company" className="text-white">Company</Label>
                       <Input
                         id="company"
                         value={formData.company || ''}
                         onChange={(e) => handleChange('company', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        placeholder="Company name"
-                        disabled={!userPermissions.canEdit}
+                        className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="primary_contact" className="text-sm text-white/80 mb-1 block">Primary Contact</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="primary_contact" className="text-white">Primary Contact</Label>
                       <Input
                         id="primary_contact"
                         value={formData.primary_contact || ''}
                         onChange={(e) => handleChange('primary_contact', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        placeholder="Contact person"
-                        disabled={!userPermissions.canEdit}
+                        className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
                       />
                     </div>
                   </div>
                 </div>
                 
                 {/* Social Links */}
-                <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
+                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold text-white flex items-center gap-2">
                       <IconLink className="w-5 h-5 text-violet-400" />
                       Social Links
                     </h2>
-                    {userPermissions.canEdit && (
-                      <Button 
-                        onClick={addSocialLink}
-                        variant="outline"
-                        size="sm"
-                        className="border-white/20 hover:bg-white/10 text-white"
-                      >
-                        <IconPlus className="w-4 h-4 mr-1" />
-                        Add Link
-                      </Button>
-                    )}
+                    <Button 
+                      onClick={addSocialLink}
+                      variant="outline"
+                      size="sm"
+                      className="border-white/20 hover:bg-white/10 text-white rounded-[8px]"
+                    >
+                      <IconPlus className="w-4 h-4 mr-1" />
+                      Add Link
+                    </Button>
                   </div>
                   <div className="space-y-3">
-                    {socialLinks.map((link) => (
-                      <div key={link.id} className="flex gap-2">
-                        <div className="w-1/3">
-                          <Select
-                            value={link.platform}
-                            onValueChange={(value) => handleSocialLinkChange(link.id, 'platform', value)}
-                            disabled={!userPermissions.canEdit}
-                          >
-                            <SelectTrigger className="bg-background/20 border-white/10 text-white">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="website">Website</SelectItem>
-                              <SelectItem value="youtube">YouTube</SelectItem>
-                              <SelectItem value="instagram">Instagram</SelectItem>
-                              <SelectItem value="twitter">Twitter</SelectItem>
-                              <SelectItem value="linkedin">LinkedIn</SelectItem>
-                              <SelectItem value="tiktok">TikTok</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="flex-grow">
-                          <Input
-                            value={link.url}
-                            onChange={(e) => handleSocialLinkChange(link.id, 'url', e.target.value)}
-                            className="bg-background/20 border-white/10 text-white"
-                            placeholder="https://..."
-                            disabled={!userPermissions.canEdit}
-                          />
-                        </div>
-                        {userPermissions.canEdit && (
-                          <Button
+                    {socialLinks.map((link) => {
+                      const platform = platformOptions.find(p => p.value === link.platform)
+                      const IconComponent = platform?.icon || IconLink
+                      
+                      return (
+                        <div key={link.id} className="flex gap-3">
+                          <div className="w-32">
+                            <Select
+                              value={link.platform}
+                              onValueChange={(value) => handleSocialLinkChange(link.id, 'platform', value)}
+                            >
+                              <SelectTrigger className="bg-white/10 border-white/10 text-white rounded-[8px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="bg-gray-800 border-white/10 text-white rounded-[8px]">
+                                {platformOptions.map((option) => {
+                                  const OptionIcon = option.icon
+                                  return (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      <div className="flex items-center gap-2">
+                                        <OptionIcon className="w-4 h-4" />
+                                        {option.label}
+                                      </div>
+                                    </SelectItem>
+                                  )
+                                })}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex-grow">
+                            <Input
+                              value={link.url}
+                              onChange={(e) => handleSocialLinkChange(link.id, 'url', e.target.value)}
+                              placeholder="https://..."
+                              className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[8px]"
+                            />
+                          </div>
+                          <Button 
                             onClick={() => removeSocialLink(link.id)}
                             variant="outline"
-                            size="icon"
-                            className="border-white/20 hover:bg-white/10 text-white"
+                            size="sm"
+                            className="border-white/20 hover:bg-white/10 text-white rounded-[8px] p-2"
                           >
                             <IconTrash className="w-4 h-4" />
                           </Button>
-                        )}
-                      </div>
-                    ))}
-                    {socialLinks.length === 0 && (
-                      <p className="text-white/50 text-center py-4">No social links added</p>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Notes */}
-                <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
-                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <IconNotes className="w-5 h-5 text-violet-400" />
-                    Notes
-                  </h2>
-                  <Textarea
-                    value={formData.notes || ''}
-                    onChange={(e) => handleChange('notes', e.target.value)}
-                    className="bg-background/20 border-white/10 text-white min-h-[120px]"
-                    placeholder="Add notes about this client..."
-                    disabled={!userPermissions.canEdit}
-                  />
-                </div>
-                
-                {/* Custom Fields */}
-                <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                      <IconTag className="w-5 h-5 text-violet-400" />
-                      Custom Fields
-                    </h2>
-                    {userPermissions.canEdit && (
-                      <Button 
-                        onClick={addCustomField}
-                        variant="outline"
-                        size="sm"
-                        className="border-white/20 hover:bg-white/10 text-white"
-                      >
-                        <IconPlus className="w-4 h-4 mr-1" />
-                        Add Field
-                      </Button>
-                    )}
-                  </div>
-                  <div className="space-y-3">
-                    {customFields.map((field) => (
-                      <div key={field.id} className="flex gap-2">
-                        <div className="w-1/3">
-                          <Input
-                            value={field.name}
-                            onChange={(e) => handleCustomFieldChange(field.id, 'name', e.target.value)}
-                            className="bg-background/20 border-white/10 text-white"
-                            placeholder="Field name"
-                            disabled={!userPermissions.canEdit}
-                          />
                         </div>
-                        <div className="flex-grow">
-                          <Input
-                            value={field.value}
-                            onChange={(e) => handleCustomFieldChange(field.id, 'value', e.target.value)}
-                            className="bg-background/20 border-white/10 text-white"
-                            placeholder="Field value"
-                            disabled={!userPermissions.canEdit}
-                          />
-                        </div>
-                        {userPermissions.canEdit && (
-                          <Button
-                            onClick={() => removeCustomField(field.id)}
-                            variant="outline"
-                            size="icon"
-                            className="border-white/20 hover:bg-white/10 text-white"
-                          >
-                            <IconTrash className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                    {customFields.length === 0 && (
-                      <p className="text-white/50 text-center py-4">No custom fields added</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Sidebar with Status, Lead Temp, and Other Details */}
-              <div className="space-y-6">
-                {/* Status and Lead Temperature */}
-                <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
-                  <h2 className="text-xl font-semibold text-white mb-4">Status</h2>
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="text-sm text-white/80 mb-1 block">Status</Label>
-                      <Select
-                        value={formData.status || 'active'}
-                        onValueChange={(value) => handleChange('status', value as Client['status'])}
-                        disabled={!userPermissions.canEdit}
-                      >
-                        <SelectTrigger className="bg-background/20 border-white/10 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="ongoing">Ongoing</SelectItem>
-                          <SelectItem value="closed">Closed</SelectItem>
-                          <SelectItem value="dead">Dead</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label className="text-sm text-white/80 mb-1 block">Lead Temperature</Label>
-                      <Select
-                        value={formData.lead_temp || 'cold'}
-                        onValueChange={(value) => handleChange('lead_temp', value as Client['lead_temp'])}
-                        disabled={!userPermissions.canEdit}
-                      >
-                        <SelectTrigger className="bg-background/20 border-white/10 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="hot">Hot</SelectItem>
-                          <SelectItem value="warm">Warm</SelectItem>
-                          <SelectItem value="cold">Cold</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="flex gap-2 pt-2">
-                      <Badge 
-                        className={
-                          formData.status === 'active' ? 'bg-green-500' :
-                          formData.status === 'ongoing' ? 'bg-blue-500' :
-                          formData.status === 'closed' ? 'bg-yellow-500' :
-                          'bg-red-500'
-                        }
-                      >
-                        {formData.status || 'active'}
-                      </Badge>
-                      <Badge 
-                        className={
-                          formData.lead_temp === 'hot' ? 'bg-red-500' :
-                          formData.lead_temp === 'warm' ? 'bg-orange-500' :
-                          'bg-blue-500'
-                        }
-                      >
-                        {formData.lead_temp || 'cold'}
-                      </Badge>
-                    </div>
+                      )
+                    })}
                   </div>
                 </div>
                 
                 {/* Outreach Information */}
-                <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
+                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
                   <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                     <IconMail className="w-5 h-5 text-violet-400" />
-                    Outreach
+                    Outreach Information
                   </h2>
                   <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="outreach_type" className="text-sm text-white/80 mb-1 block">Outreach Type</Label>
-                      <Select
-                        value={formData.outreach_type || ''}
-                        onValueChange={(value) => handleChange('outreach_type', value as Client['outreach_type'])}
-                        disabled={!userPermissions.canEdit}
-                      >
-                        <SelectTrigger className="bg-background/20 border-white/10 text-white">
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Cold Email">Cold Email</SelectItem>
-                          <SelectItem value="Reedit">Reedit</SelectItem>
-                          <SelectItem value="YT Jobs">YT Jobs</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-white">Outreach Type</Label>
+                        <Select
+                          value={formData.outreach_type || ''}
+                          onValueChange={(value) => handleChange('outreach_type', value as Client['outreach_type'])}
+                        >
+                          <SelectTrigger className="bg-white/10 border-white/10 text-white rounded-[12px]">
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-800 border-white/10 text-white rounded-[12px]">
+                            <SelectItem value="Cold Email">Cold Email</SelectItem>
+                            <SelectItem value="Reedit">Reedit</SelectItem>
+                            <SelectItem value="YT Jobs">YT Jobs</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="outreach_platform" className="text-white">Outreach Platform</Label>
+                        <Input
+                          id="outreach_platform"
+                          value={formData.outreach_platform || ''}
+                          onChange={(e) => handleChange('outreach_platform', e.target.value)}
+                          placeholder="e.g., LinkedIn, Email"
+                          className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
+                        />
+                      </div>
                     </div>
                     
-                    <div>
-                      <Label htmlFor="outreach_platform" className="text-sm text-white/80 mb-1 block">Platform</Label>
-                      <Input
-                        id="outreach_platform"
-                        value={formData.outreach_platform || ''}
-                        onChange={(e) => handleChange('outreach_platform', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        placeholder="Platform name"
-                        disabled={!userPermissions.canEdit}
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="outreach_date" className="text-white">Outreach Date</Label>
+                        <Input
+                          id="outreach_date"
+                          type="date"
+                          value={formData.outreach_date ? formData.outreach_date.split('T')[0] : ''}
+                          onChange={(e) => handleChange('outreach_date', e.target.value)}
+                          className="bg-white/10 border-white/10 text-white rounded-[12px]"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="first_outreach_date" className="text-white">First Outreach Date</Label>
+                        <Input
+                          id="first_outreach_date"
+                          type="date"
+                          value={formData.first_outreach_date ? formData.first_outreach_date.split('T')[0] : ''}
+                          onChange={(e) => handleChange('first_outreach_date', e.target.value)}
+                          className="bg-white/10 border-white/10 text-white rounded-[12px]"
+                        />
+                      </div>
                     </div>
                     
-                    <div>
-                      <Label htmlFor="outreach_date" className="text-sm text-white/80 mb-1 block">Outreach Date</Label>
-                      <Input
-                        id="outreach_date"
-                        type="date"
-                        value={formData.outreach_date ? formData.outreach_date.split('T')[0] : ''}
-                        onChange={(e) => handleChange('outreach_date', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        disabled={!userPermissions.canEdit}
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="outreach_link_sent" className="text-sm text-white/80 mb-1 block">Link Sent</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="outreach_link_sent" className="text-white">Outreach Link Sent</Label>
                       <Input
                         id="outreach_link_sent"
                         value={formData.outreach_link_sent || ''}
                         onChange={(e) => handleChange('outreach_link_sent', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        placeholder="Link sent to client"
-                        disabled={!userPermissions.canEdit}
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="outreach_notes" className="text-sm text-white/80 mb-1 block">Outreach Notes</Label>
-                      <Textarea
-                        id="outreach_notes"
-                        value={formData.outreach_notes || ''}
-                        onChange={(e) => handleChange('outreach_notes', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white min-h-[80px]"
-                        placeholder="Notes about the outreach"
-                        disabled={!userPermissions.canEdit}
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="first_outreach_date" className="text-sm text-white/80 mb-1 block">First Outreach Date</Label>
-                      <Input
-                        id="first_outreach_date"
-                        type="date"
-                        value={formData.first_outreach_date ? formData.first_outreach_date.split('T')[0] : ''}
-                        onChange={(e) => handleChange('first_outreach_date', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        disabled={!userPermissions.canEdit}
+                        placeholder="https://example.com/reel"
+                        className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
                       />
                     </div>
                   </div>
                 </div>
-                
+              </div>
+              
+              {/* Right Column - Follow-up & Tags */}
+              <div className="space-y-6">
                 {/* Follow-up Information */}
-                <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
+                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
                   <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <IconCalendar className="w-5 h-5 text-violet-400" />
-                    Follow-up
+                    <IconTag className="w-5 h-5 text-violet-400" />
+                    Follow-up Information
                   </h2>
                   <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="did_reply" className="text-sm text-white/80 mb-1 block">Did They Reply?</Label>
-                      <Select
-                        value={formData.did_reply || ''}
-                        onValueChange={(value) => handleChange('did_reply', value as Client['did_reply'])}
-                        disabled={!userPermissions.canEdit}
-                      >
-                        <SelectTrigger className="bg-background/20 border-white/10 text-white">
-                          <SelectValue placeholder="Select reply status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="No Reply">No Reply</SelectItem>
-                          <SelectItem value="Interested">Interested</SelectItem>
-                          <SelectItem value="Ghosted">Ghosted</SelectItem>
-                          <SelectItem value="Replied - Needs Follow-up">Replied - Needs Follow-up</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="follow_up_status" className="text-sm text-white/80 mb-1 block">Follow-up Status</Label>
+                    <div className="space-y-2">
+                      <Label className="text-white">Follow-up Status</Label>
                       <Select
                         value={formData.follow_up_status || ''}
                         onValueChange={(value) => handleChange('follow_up_status', value as Client['follow_up_status'])}
-                        disabled={!userPermissions.canEdit}
                       >
-                        <SelectTrigger className="bg-background/20 border-white/10 text-white">
+                        <SelectTrigger className="bg-white/10 border-white/10 text-white rounded-[12px]">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-gray-800 border-white/10 text-white rounded-[12px]">
                           <SelectItem value="Not Started">Not Started</SelectItem>
                           <SelectItem value="In Progress">In Progress</SelectItem>
                           <SelectItem value="Completed">Completed</SelectItem>
@@ -742,125 +550,64 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
                       </Select>
                     </div>
                     
-                    <div>
-                      <Label htmlFor="next_follow_up_date" className="text-sm text-white/80 mb-1 block">Next Follow-up Date</Label>
-                      <Input
-                        id="next_follow_up_date"
-                        type="date"
-                        value={formData.next_follow_up_date ? formData.next_follow_up_date.split('T')[0] : ''}
-                        onChange={(e) => handleChange('next_follow_up_date', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        disabled={!userPermissions.canEdit}
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="follow_up_count" className="text-sm text-white/80 mb-1 block">Follow-up Count</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="follow_up_count" className="text-white">Follow-up Count</Label>
                       <Input
                         id="follow_up_count"
                         type="number"
                         value={formData.follow_up_count || 0}
                         onChange={(e) => handleChange('follow_up_count', parseInt(e.target.value) || 0)}
-                        className="bg-background/20 border-white/10 text-white"
-                        disabled={!userPermissions.canEdit}
+                        className="bg-white/10 border-white/10 text-white rounded-[12px]"
                       />
                     </div>
                     
-                    <div>
-                      <Label htmlFor="platforms_followed_up_on" className="text-sm text-white/80 mb-1 block">Platforms Followed Up On</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="next_follow_up_date" className="text-white">Next Follow-up Date</Label>
                       <Input
-                        id="platforms_followed_up_on"
-                        value={formData.platforms_followed_up_on || ''}
-                        onChange={(e) => handleChange('platforms_followed_up_on', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        placeholder="Comma separated platforms"
-                        disabled={!userPermissions.canEdit}
+                        id="next_follow_up_date"
+                        type="date"
+                        value={formData.next_follow_up_date ? formData.next_follow_up_date.split('T')[0] : ''}
+                        onChange={(e) => handleChange('next_follow_up_date', e.target.value)}
+                        className="bg-white/10 border-white/10 text-white rounded-[12px]"
                       />
                     </div>
                   </div>
                 </div>
                 
-                {/* Pricing Details */}
-                <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
+                {/* Tags */}
+                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
                   <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <IconCurrencyDollar className="w-5 h-5 text-violet-400" />
-                    Pricing
+                    <IconTag className="w-5 h-5 text-violet-400" />
+                    Tags
                   </h2>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="subscriber_count" className="text-sm text-white/80 mb-1 block">Subscriber Count</Label>
-                      <Input
-                        id="subscriber_count"
-                        type="number"
-                        value={formData.subscriber_count || ''}
-                        onChange={(e) => handleChange('subscriber_count', parseInt(e.target.value) || 0)}
-                        className="bg-background/20 border-white/10 text-white"
-                        placeholder="Subscriber count"
-                        disabled={!userPermissions.canEdit}
-                      />
-                    </div>
+                  <div className="space-y-3">
+                    <Textarea
+                      value={formData.tags || ''}
+                      onChange={(e) => handleChange('tags', e.target.value)}
+                      placeholder="Enter tags separated by commas"
+                      className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px] min-h-[80px]"
+                    />
+                    <p className="text-sm text-white/70">Example: high-priority, video-editing, youtube</p>
                   </div>
                 </div>
                 
-                {/* Metadata */}
-                <div className="bg-card/30 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
-                  <h2 className="text-xl font-semibold text-white mb-4">Metadata</h2>
+                {/* Notes */}
+                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
+                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                    <IconNotes className="w-5 h-5 text-violet-400" />
+                    Notes
+                  </h2>
                   <div className="space-y-3">
-                    <div>
-                      <Label className="text-sm text-white/80 mb-1 block">Created At</Label>
-                      <div className="text-white/70">
-                        {client.created_at ? new Date(client.created_at).toLocaleString() : 'N/A'}
-                      </div>
-                    </div>
-                    <div>
-                      <Label className="text-sm text-white/80 mb-1 block">Last Updated</Label>
-                      <div className="text-white/70">
-                        {client.updated_at ? new Date(client.updated_at).toLocaleString() : 'N/A'}
-                      </div>
-                    </div>
-                    <div>
-                      <Label className="text-sm text-white/80 mb-1 block">Source</Label>
-                      <Input
-                        value={formData.source || ''}
-                        onChange={(e) => handleChange('source', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        placeholder="Source of lead"
-                        disabled={!userPermissions.canEdit}
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm text-white/80 mb-1 block">Tags</Label>
-                      <Input
-                        value={formData.tags || ''}
-                        onChange={(e) => handleChange('tags', e.target.value)}
-                        className="bg-background/20 border-white/10 text-white"
-                        placeholder="Comma separated tags"
-                        disabled={!userPermissions.canEdit}
-                      />
-                    </div>
+                    <Textarea
+                      value={formData.notes || ''}
+                      onChange={(e) => handleChange('notes', e.target.value)}
+                      placeholder="Add any additional notes about this client"
+                      className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px] min-h-[120px]"
+                    />
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          
-          {/* Footer with Action Buttons */}
-          <div className="bg-card/20 backdrop-blur-lg border-t border-white/10 p-4 flex justify-between">
-            <Button 
-              onClick={handleDiscard}
-              variant="outline"
-              className="border-white/20 hover:bg-white/10 text-white"
-              disabled={isSaving}
-            >
-              Discard Changes
-            </Button>
-            <Button 
-              onClick={handleSave}
-              disabled={isSaving || !formData.name || !userPermissions.canEdit}
-              className="bg-violet-600 hover:bg-violet-700 text-white"
-            >
-              {isSaving ? 'Saving...' : 'Save Changes'}
-            </Button>
           </div>
         </div>
       </DialogContent>
