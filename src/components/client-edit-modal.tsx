@@ -56,7 +56,7 @@ interface CustomField {
 export function ClientEditModal({ client, open, onClose, onSave }: ClientEditModalProps) {
   const [formData, setFormData] = useState<Partial<Client>>({})
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([])
-  const [customFields, setCustomFields] = useState<CustomField[]>([])
+  const [, setCustomFields] = useState<CustomField[]>([])
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -399,8 +399,6 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
                   </div>
                   <div className="space-y-3">
                     {socialLinks.map((link) => {
-                      const platform = platformOptions.find(p => p.value === link.platform)
-                      const IconComponent = platform?.icon || IconLink
                       
                       return (
                         <div key={link.id} className="flex gap-3">

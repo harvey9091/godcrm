@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSession } from '@/lib/supabase/auth'
 import { getClosedClients, addClosedClient, deleteClosedClient, getInvoicesByClientId, deleteInvoice } from '@/lib/supabase/db'
@@ -22,7 +22,6 @@ import {
   IconUpload, 
   IconTrash, 
   IconDownload,
-  IconAlertTriangle,
   IconUsers,
   IconTrendingUp
 } from '@tabler/icons-react'
@@ -54,8 +53,9 @@ export default function ClosedClients() {
     month: '',
   })
   const [invoiceFile, setInvoiceFile] = useState<File | null>(null)
+  
   // Fetch closed clients and their invoices
-  const fetchClosedClients = async () => {
+  const fetchClosedClients = useCallback(async () => {
     try {
       const session = await getSession()
       if (!session) {
@@ -79,7 +79,7 @@ export default function ClosedClients() {
     } catch (err) {
       console.error('Error fetching closed clients:', err)
     }
-  }
+  }, [router])
 
   // Add a modern toast notification system
   const showToast = (message: string, type: 'success' | 'error' | 'info') => {
@@ -226,7 +226,7 @@ export default function ClosedClients() {
     }
     
     fetchData()
-  }, [router, fetchClosedClients])
+  }, [fetchClosedClients])
 
   // Calculate revenue based on form data
   const calculatedRevenue = useMemo(() => {

@@ -60,7 +60,7 @@ export const fixTableStructure = async (): Promise<{ success: boolean; message: 
       const alternatives = ['closedclients', 'closed_clients']
       for (const altName of alternatives) {
         try {
-          const { data: altData, error: altError } = await supabase
+          const { error: altError } = await supabase
             .from(altName)
             .select('*')
             .limit(1)
@@ -72,6 +72,7 @@ export const fixTableStructure = async (): Promise<{ success: boolean; message: 
               message: `Data found in table '${altName}' instead of 'closedClients'. Please rename the table or update the application code.`
             }
           }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
           console.log(`Alternative table ${altName} also not accessible`)
         }

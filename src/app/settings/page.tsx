@@ -76,8 +76,6 @@ export default function SettingsPage() {
     setIsSaving(true)
     
     // Get the name from the input
-    const nameInput = document.getElementById('name') as HTMLInputElement
-    const name = nameInput?.value || ''
     
     try {
       // In a real implementation, you would save to your database or update user metadata

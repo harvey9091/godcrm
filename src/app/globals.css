@@ -1,6 +1,5 @@
 /* stylelint-disable at-rule-no-unknown */
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @theme inline {
   --color-background: var(--background);
@@ -98,6 +97,7 @@
   --color-destructive-foreground: var(--destructive-foreground)
 }
 
+/* Tailwind CSS v4 directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

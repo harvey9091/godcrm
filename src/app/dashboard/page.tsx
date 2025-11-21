@@ -56,16 +56,6 @@ interface DashboardClosedClient {
   status: 'closed'
 }
 
-// Define the closed client type from the database
-interface ClosedClientFromDB {
-  id: string
-  created_by: string
-  name: string
-  videosPerMonth: number
-  chargePerVideo: number
-  monthlyRevenue: number
-  created_at: string
-}
 
 // Mock data for the charts
 const chartData = [

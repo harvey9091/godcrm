@@ -23,7 +23,6 @@ import { Client } from '@/lib/types'
 import { 
   IconUser, 
   IconMail, 
-  IconBuilding, 
   IconBrandYoutube, 
   IconBrandInstagram, 
   IconBrandTwitter, 
@@ -32,7 +31,6 @@ import {
   IconLink, 
   IconCalendar, 
   IconNotes, 
-  IconTag,
   IconCloudUpload,
   IconChevronDown,
   IconPlus,
