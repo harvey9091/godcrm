@@ -47,12 +47,12 @@ export const addSampleClosedClients = async (): Promise<{ success: boolean; mess
       }
     }
     
-    // Insert sample clients using snake_case column names
+    // Insert sample clients using camelCase column names
     const clientsWithUser = sampleClients.map(client => ({
       name: client.name,
-      videospermonth: client.videosPerMonth,
-      chargepervideo: client.chargePerVideo,
-      monthlyrevenue: client.videosPerMonth * client.chargePerVideo,
+      videosPerMonth: client.videosPerMonth,
+      chargePerVideo: client.chargePerVideo,
+      monthlyRevenue: client.videosPerMonth * client.chargePerVideo,
       created_by: user.id
     }))
     
