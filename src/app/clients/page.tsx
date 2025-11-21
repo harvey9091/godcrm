@@ -193,15 +193,26 @@ export default function ClientsPage() {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjciIG51bU9jdGF2ZXM9IjEwIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIj48L2ZlVHVyYnVsZW5jZT48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ij48L3JlY3Q+PC9zdmc+')] opacity-20"></div>
       </div>
       
-      <div className="space-y-6 relative z-10">
+      <div className="space-y-6 relative z-10 animate-fadeInUp">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white">Leads</h1>
             <p className="text-white/70 mt-1">Manage your client leads and prospects</p>
           </div>
           <Button 
-            onClick={() => router.push('/clients/new')}
-            className="bg-violet-600 hover:bg-violet-700 text-white rounded-[12px] flex items-center"
+            onClick={() => {
+              // Add a smooth fade-out animation before navigating
+              const container = document.querySelector('.space-y-6');
+              if (container) {
+                container.classList.add('animate-fadeOut');
+                setTimeout(() => {
+                  router.push('/clients/new');
+                }, 300); // Match the animation duration
+              } else {
+                router.push('/clients/new');
+              }
+            }}
+            className="bg-violet-600 hover:bg-violet-700 text-white rounded-[12px] flex items-center transition-all duration-300 transform hover:scale-105"
           >
             <IconPlus className="mr-2 h-4 w-4" />
             Add New Client
