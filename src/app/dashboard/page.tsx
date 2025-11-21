@@ -436,14 +436,14 @@ export default function DashboardPage() {
           {/* Left Column - Larger */}
           <div className="lg:col-span-3 space-y-5 flex flex-col">
             {/* Revenue Trend Chart - Now shorter */}
-            <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg flex-grow flex flex-col transition-all duration-300 hover:shadow-xl hover:border-white/20 animate-fadeInUp">
+            <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg flex flex-col transition-all duration-300 hover:shadow-xl hover:border-white/20 animate-fadeInUp">
               <CardHeader className="pb-4 pt-5">
                 <CardTitle className="text-2xl font-semibold text-white">
                   Revenue Trend
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-4 flex-grow flex flex-col">
-                <div className="flex-grow min-h-[60px]">
+                <div style={{ height: '450px' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
