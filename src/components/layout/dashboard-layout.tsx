@@ -12,7 +12,8 @@ import {
   IconLogout,
   IconMenu,
   IconX,
-  IconSettings
+  IconSettings,
+  IconRobot
 } from '@tabler/icons-react'
 import { Toaster } from 'sonner'
 import { User } from '@supabase/supabase-js'
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: IconLayoutDashboard },
   { name: 'Leads', href: '/clients', icon: IconUsers },
   { name: 'Closed Clients', href: '/assets', icon: IconAsset },
+  { name: 'AI Analysis', href: '/ai-analysis', icon: IconRobot },
   { name: 'Settings', href: '/settings', icon: IconSettings },
 ]
 

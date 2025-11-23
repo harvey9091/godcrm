@@ -17,11 +17,14 @@ import {
   IconSettings, 
   IconChevronDown,
   IconUpload,
-  IconCheck
+  IconCheck,
+  IconRobot
 } from '@tabler/icons-react'
 
-// Add a small comment to refresh TypeScript
-// This is a refresh comment
+// Handle saving of Gemini API key
+const handleSaveGeminiApiKey = (apiKey: string) => {
+  localStorage.setItem('geminiApiKey', apiKey)
+}
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme()
@@ -31,16 +34,21 @@ export default function SettingsPage() {
     profile: true,
     notifications: true,
     outreach: true,
+    integrations: true,
     account: true,
     appearance: true
   })
   const [isSaving, setIsSaving] = useState(false)
+  const [geminiApiKey, setGeminiApiKey] = useState('')
 
   // This ensures we only render theme-dependent content after hydration
   useEffect(() => {
     // Use setTimeout to avoid cascading renders warning
     const timer = setTimeout(() => {
       setIsMounted(true)
+      // Load Gemini API key from localStorage
+      const savedApiKey = localStorage.getItem('geminiApiKey') || ''
+      setGeminiApiKey(savedApiKey)
     }, 0)
     
     return () => clearTimeout(timer)
@@ -75,7 +83,8 @@ export default function SettingsPage() {
   const handleSaveSettings = async () => {
     setIsSaving(true)
     
-    // Get the name from the input
+    // Save Gemini API key
+    handleSaveGeminiApiKey(geminiApiKey)
     
     try {
       // In a real implementation, you would save to your database or update user metadata
@@ -342,6 +351,41 @@ export default function SettingsPage() {
                 >
                   Switch to {getNextThemeLabel()} Mode
                 </Button>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* AI Integrations Card */}
+        <Card className="mb-6 bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg transition-all duration-300 hover:shadow-xl hover:border-white/20">
+          <CardHeader 
+            className="pb-3 pt-4 cursor-pointer flex flex-row items-center justify-between"
+            onClick={() => toggleSection('integrations')}
+          >
+            <div>
+              <CardTitle className="flex items-center text-white">
+                <IconRobot className="mr-2 h-5 w-5" />
+                AI Integrations
+              </CardTitle>
+              <CardDescription className="text-white/70">Configure your AI service API keys</CardDescription>
+            </div>
+            <IconChevronDown 
+              className={`h-5 w-5 text-white transition-transform duration-300 ${expandedSections.integrations ? 'rotate-180' : ''}`} 
+            />
+          </CardHeader>
+          {expandedSections.integrations && (
+            <CardContent className="space-y-5 pb-4">
+              <div className="space-y-2">
+                <Label htmlFor="gemini-api-key" className="text-white">Gemini API Key</Label>
+                <Input 
+                  id="gemini-api-key" 
+                  type="password" 
+                  placeholder="Enter your Gemini API key" 
+                  value={geminiApiKey}
+                  onChange={(e) => setGeminiApiKey(e.target.value)}
+                  className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px] h-10" 
+                />
+                <p className="text-sm text-white/70">Used for AI-powered client analysis. Get your key from <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:underline">Google AI Studio</a>.</p>
               </div>
             </CardContent>
           )}
