@@ -25,6 +25,8 @@ export default function AIAnalysisPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [clients, setClients] = useState<Client[]>([])
   const [closedClients, setClosedClients] = useState<ClosedClient[]>([])
+  const [debugInfo, setDebugInfo] = useState<{clientsCount: number, closedClientsCount: number, totalRevenue: number}>({clientsCount: 0, closedClientsCount: 0, totalRevenue: 0})
+  const [debugClosedClients, setDebugClosedClients] = useState<ClosedClient[]>([])
   const [analysisResult, setAnalysisResult] = useState('')
   const [error, setError] = useState('')
   // Removed chart data state variables as graphs are being removed
@@ -33,15 +35,27 @@ export default function AIAnalysisPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log('Fetching clients and closed clients data...')
         const [clientsData, closedClientsData] = await Promise.all([
           getClients(),
           getClosedClients()
         ])
+        console.log('Clients data:', clientsData)
+        console.log('Closed clients data:', closedClientsData)
+        
+        // Calculate debug info
+        const clientsCount = clientsData?.length || 0
+        const closedClientsCount = closedClientsData?.length || 0
+        const totalRevenue = closedClientsData?.reduce((sum, client) => sum + (client.monthlyRevenue || 0), 0) || 0
+        
+        setDebugInfo({clientsCount, closedClientsCount, totalRevenue})
+        setDebugClosedClients(closedClientsData || [])
         setClients(clientsData || [])
         setClosedClients(closedClientsData || [])
+        console.log('State updated with clients:', clientsCount, 'and closed clients:', closedClientsCount, 'total revenue:', totalRevenue)
       } catch (err) {
         console.error('Error fetching data:', err)
-        setError('Failed to load client data')
+        setError('Failed to load client data: ' + (err instanceof Error ? err.message : String(err)))
       } finally {
         setLoading(false)
       }
@@ -204,6 +218,7 @@ export default function AIAnalysisPage() {
             </CardHeader>
             <CardContent className="pb-4">
               <div className="text-3xl font-bold text-white">{clients.length}</div>
+              <div className="text-sm text-white/70">Debug: {debugInfo.clientsCount}</div>
             </CardContent>
           </Card>
           
@@ -216,6 +231,7 @@ export default function AIAnalysisPage() {
             </CardHeader>
             <CardContent className="pb-4">
               <div className="text-3xl font-bold text-white">{closedClients.length}</div>
+              <div className="text-sm text-white/70">Debug: {debugInfo.closedClientsCount}</div>
             </CardContent>
           </Card>
           
@@ -230,9 +246,26 @@ export default function AIAnalysisPage() {
               <div className="text-3xl font-bold text-white">
                 ${closedClients.reduce((sum, client) => sum + (client.monthlyRevenue || 0), 0).toLocaleString()}
               </div>
+              <div className="text-sm text-white/70">Debug: ${debugInfo.totalRevenue.toLocaleString()}</div>
             </CardContent>
           </Card>
         </div>
+        
+        <Card className="mb-6 bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg transition-all duration-300 hover:shadow-xl hover:border-white/20">
+          <CardHeader className="pb-3 pt-4">
+            <CardTitle className="flex items-center text-white">
+              <IconAnalyze className="mr-2 h-5 w-5" />
+              Raw Closed Clients Data (Debug)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <div className="bg-white/5 border border-white/10 rounded-[12px] p-4 max-h-40 overflow-y-auto custom-scrollbar">
+              <pre className="whitespace-pre-wrap text-white text-xs">
+                {JSON.stringify(debugClosedClients, null, 2)}
+              </pre>
+            </div>
+          </CardContent>
+        </Card>
         
         <Card className="mb-6 bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg transition-all duration-300 hover:shadow-xl hover:border-white/20 flex-grow">
           <CardHeader className="pb-3 pt-4">

@@ -352,19 +352,19 @@ export const getClosedClients = async (): Promise<ClosedClient[]> => {
   console.log('Attempting to fetch closedClients from Supabase...')
   
   try {
-    // Use camelCase column names to match the actual database schema
+    // Use snake_case column names to match the actual database schema
     const { data, error } = await supabase
       .from('closedClients')
       .select(`
         id,
         created_by,
         name,
-        videosPerMonth,
-        chargePerVideo,
-        monthlyRevenue,
+        videospermonth,
+        chargepervideo,
+        monthlyrevenue,
         created_at
       `)
-      .order('monthlyRevenue', { ascending: false })
+      .order('monthlyrevenue', { ascending: false })
     
     if (error) {
       console.error('Supabase error in getClosedClients:', error)
@@ -417,8 +417,26 @@ export const getClosedClients = async (): Promise<ClosedClient[]> => {
       throw new Error(`Database error: ${error.message}`)
     }
     
-    // Since we're using the correct column names, no transformation is needed
-    return data as ClosedClient[] || []
+    // Transform the data to match our TypeScript interface (camelCase)
+    const transformedData = data?.map((item: { 
+      id: string; 
+      created_by: string; 
+      name: string; 
+      videospermonth: number; 
+      chargepervideo: number; 
+      monthlyrevenue: number; 
+      created_at: string 
+    }) => ({
+      id: item.id,
+      created_by: item.created_by,
+      name: item.name,
+      videosPerMonth: item.videospermonth,
+      chargePerVideo: item.chargepervideo,
+      monthlyRevenue: item.monthlyrevenue,
+      created_at: item.created_at
+    })) || []
+    
+    return transformedData as ClosedClient[]
   } catch (err) {
     // Handle any unexpected errors
     console.error('Unexpected error in getClosedClients:', err)
@@ -441,23 +459,23 @@ export const addClosedClient = async (client: Omit<ClosedClient, 'id' | 'created
   // Calculate monthly revenue on the server side
   const monthlyRevenue = client.videosPerMonth * client.chargePerVideo
   
-  // Use camelCase column names to match the actual database schema
+  // Use snake_case column names to match the actual database schema
   const { data, error } = await supabase
     .from('closedClients')
     .insert([{ 
       name: client.name,
-      videosPerMonth: client.videosPerMonth,
-      chargePerVideo: client.chargePerVideo,
-      monthlyRevenue: monthlyRevenue,
+      videospermonth: client.videosPerMonth,
+      chargepervideo: client.chargePerVideo,
+      monthlyrevenue: monthlyRevenue,
       created_by: user.id
     }])
     .select(`
       id,
       created_by,
       name,
-      videosPerMonth,
-      chargePerVideo,
-      monthlyRevenue,
+      videospermonth,
+      chargepervideo,
+      monthlyrevenue,
       created_at
     `)
     .single()
@@ -493,35 +511,45 @@ export const addClosedClient = async (client: Omit<ClosedClient, 'id' | 'created
     throw error
   }
   
-  // Since we're using the correct column names, no transformation is needed
-  return data as ClosedClient
+  // Transform the data to match our TypeScript interface (camelCase)
+  const transformedData = {
+    id: data.id,
+    created_by: data.created_by,
+    name: data.name,
+    videosPerMonth: data.videospermonth,
+    chargePerVideo: data.chargepervideo,
+    monthlyRevenue: data.monthlyrevenue,
+    created_at: data.created_at
+  }
+  
+  return transformedData as ClosedClient
 }
 
 export const updateClosedClient = async (id: string, client: Partial<ClosedClient>): Promise<ClosedClient> => {
   const supabase = getSupabaseClient()
   
-  // Prepare update data with camelCase column names
+  // Prepare update data with snake_case column names
   const updateData: Record<string, unknown> = {}
   
   if (client.name !== undefined) updateData.name = client.name
-  if (client.videosPerMonth !== undefined) updateData.videosPerMonth = client.videosPerMonth
-  if (client.chargePerVideo !== undefined) updateData.chargePerVideo = client.chargePerVideo
+  if (client.videosPerMonth !== undefined) updateData.videospermonth = client.videosPerMonth
+  if (client.chargePerVideo !== undefined) updateData.chargepervideo = client.chargePerVideo
   
   // If videosPerMonth and chargePerVideo are provided, recalculate monthlyRevenue
   if (client.videosPerMonth !== undefined && client.chargePerVideo !== undefined) {
-    updateData.monthlyRevenue = client.videosPerMonth * client.chargePerVideo
+    updateData.monthlyrevenue = client.videosPerMonth * client.chargePerVideo
   } else if (client.videosPerMonth !== undefined || client.chargePerVideo !== undefined) {
     // If only one of them is provided, we need to fetch the other value to recalculate
     const { data: existingClient } = await supabase
       .from('closedClients')
-      .select('videosPerMonth, chargePerVideo')
+      .select('videospermonth, chargepervideo')
       .eq('id', id)
       .single()
     
     if (existingClient) {
-      const videosPerMonth = client.videosPerMonth !== undefined ? client.videosPerMonth : existingClient.videosPerMonth
-      const chargePerVideo = client.chargePerVideo !== undefined ? client.chargePerVideo : existingClient.chargePerVideo
-      updateData.monthlyRevenue = videosPerMonth * chargePerVideo
+      const videosPerMonth = client.videosPerMonth !== undefined ? client.videosPerMonth : existingClient.videospermonth
+      const chargePerVideo = client.chargePerVideo !== undefined ? client.chargePerVideo : existingClient.chargepervideo
+      updateData.monthlyrevenue = videosPerMonth * chargePerVideo
     }
   }
   
@@ -533,9 +561,9 @@ export const updateClosedClient = async (id: string, client: Partial<ClosedClien
       id,
       created_by,
       name,
-      videosPerMonth,
-      chargePerVideo,
-      monthlyRevenue,
+      videospermonth,
+      chargepervideo,
+      monthlyrevenue,
       created_at
     `)
     .single()
@@ -549,8 +577,18 @@ export const updateClosedClient = async (id: string, client: Partial<ClosedClien
     throw error
   }
   
-  // Since we're using the correct column names, no transformation is needed
-  return data as ClosedClient
+  // Transform the data to match our TypeScript interface (camelCase)
+  const transformedData = {
+    id: data.id,
+    created_by: data.created_by,
+    name: data.name,
+    videosPerMonth: data.videospermonth,
+    chargePerVideo: data.chargepervideo,
+    monthlyRevenue: data.monthlyrevenue,
+    created_at: data.created_at
+  }
+  
+  return transformedData as ClosedClient
 }
 
 export const deleteClosedClient = async (id: string): Promise<void> => {
