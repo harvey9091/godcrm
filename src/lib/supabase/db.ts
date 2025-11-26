@@ -279,6 +279,12 @@ export const getInvoicesByClientId = async (clientId: string): Promise<Invoice[]
   
   if (error) {
     console.error('Supabase error in getInvoicesByClientId:', error)
+    // Handle "relation does not exist" error specifically for invoices table
+    if (error.message.includes('relation') && error.message.includes('does not exist')) {
+      console.error('The invoices table does not exist in the database.')
+      console.error('Please run the create-invoices-table.sql script in your Supabase SQL editor.')
+      throw new Error('The invoices table does not exist in your database. Please make sure you have run the create-invoices-table.sql script in your Supabase SQL editor.')
+    }
     // If it's a permission error, return empty array instead of throwing
     if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
       return []
@@ -298,6 +304,12 @@ export const createInvoice = async (invoice: Omit<Invoice, 'id' | 'created_at'>)
   
   if (error) {
     console.error('Supabase error in createInvoice:', error)
+    // Handle "relation does not exist" error specifically for invoices table
+    if (error.message.includes('relation') && error.message.includes('does not exist')) {
+      console.error('The invoices table does not exist in the database.')
+      console.error('Please run the create-invoices-table.sql script in your Supabase SQL editor.')
+      throw new Error('The invoices table does not exist in your database. Please make sure you have run the create-invoices-table.sql script in your Supabase SQL editor.')
+    }
     // If it's a permission error, provide a more helpful message
     if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
       throw new Error('Permission denied: Unable to create invoice. Please make sure you are logged in.')
@@ -318,6 +330,12 @@ export const updateInvoice = async (id: string, invoice: Partial<Invoice>): Prom
   
   if (error) {
     console.error('Supabase error in updateInvoice:', error)
+    // Handle "relation does not exist" error specifically for invoices table
+    if (error.message.includes('relation') && error.message.includes('does not exist')) {
+      console.error('The invoices table does not exist in the database.')
+      console.error('Please run the create-invoices-table.sql script in your Supabase SQL editor.')
+      throw new Error('The invoices table does not exist in your database. Please make sure you have run the create-invoices-table.sql script in your Supabase SQL editor.')
+    }
     // If it's a permission error, provide a more helpful message
     if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
       throw new Error('Permission denied: Unable to update invoice. Please make sure you are logged in and have permission to edit this invoice.')
@@ -336,6 +354,12 @@ export const deleteInvoice = async (id: string): Promise<void> => {
   
   if (error) {
     console.error('Supabase error in deleteInvoice:', error)
+    // Handle "relation does not exist" error specifically for invoices table
+    if (error.message.includes('relation') && error.message.includes('does not exist')) {
+      console.error('The invoices table does not exist in the database.')
+      console.error('Please run the create-invoices-table.sql script in your Supabase SQL editor.')
+      throw new Error('The invoices table does not exist in your database. Please make sure you have run the create-invoices-table.sql script in your Supabase SQL editor.')
+    }
     // If it's a permission error, provide a more helpful message
     if (error.message.includes('permission') || error.message.includes('Unauthorized')) {
       throw new Error('Permission denied: Unable to delete invoice. Please make sure you are logged in and have permission to delete this invoice.')

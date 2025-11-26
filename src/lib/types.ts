@@ -66,6 +66,7 @@ export type Invoice = {
   status: 'paid' | 'pending'
   file_url: string
   month: string // Format: YYYY-MM
+  videos_count: number // Number of videos in this invoice
   created_at: string
 }
 
