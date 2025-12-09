@@ -1,3 +1,7 @@
 {
-  "buildCommand": "pnpm vercel-build"
+  "buildCommand": "pnpm install --no-frozen-lockfile && pnpm build",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "env": {
+    "PNPM_FROZEN_LOCKFILE": "false"
+  }
 }
