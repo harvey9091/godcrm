@@ -18,7 +18,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
         } else {
           router.push('/login')
         }
-      } catch (error) {
+      } catch (_error) {
         router.push('/login')
       } finally {
         setLoading(false)

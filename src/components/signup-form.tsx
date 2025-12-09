@@ -52,7 +52,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       if (data.user) {
         router.push('/dashboard')
       }
-    } catch (err) {
+    } catch (_err) {
       setError('An unexpected error occurred')
       setLoading(false)
     }

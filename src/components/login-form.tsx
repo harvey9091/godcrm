@@ -48,7 +48,7 @@ export function LoginForm({
       if (data.user) {
         router.push('/dashboard')
       }
-    } catch (err) {
+    } catch (_error) {
       setError('An unexpected error occurred')
       setLoading(false)
     }

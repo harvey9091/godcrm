@@ -1,6 +1,6 @@
 "use client";
-import { animate, motion } from "motion/react";
-import React, { useEffect, useMemo } from "react";
+import { animate } from "motion/react";
+import React, { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { GoCopilot } from "react-icons/go";
 
@@ -20,10 +20,9 @@ export default function CardDemo() {
 }
 
 const Skeleton = () => {
-  const scale = [1, 1.1, 1];
-  const transform = ["translateY(0px)", "translateY(-4px)", "translateY(0px)"];
-
   useEffect(() => {
+    const scale = [1, 1.1, 1];
+    const transform = ["translateY(0px)", "translateY(-4px)", "translateY(0px)"];
     // Animate each circle sequentially
     const circles = [".circle-1", ".circle-2", ".circle-3", ".circle-4", ".circle-5"];
     
@@ -72,9 +71,10 @@ const Skeleton = () => {
     </div>
   );
 };
-const Sparkles = () => {
-  return null;
-};
+
+// const Sparkles = () => {
+//   return null;
+// };
 
 export const Card = ({
   className,

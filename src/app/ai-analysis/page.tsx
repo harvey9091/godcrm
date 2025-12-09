@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,7 +24,6 @@ export default function AIAnalysisPage() {
   const [closedClients, setClosedClients] = useState<ClosedClient[]>([])
   const [analysisResult, setAnalysisResult] = useState('')
   const [error, setError] = useState('')
-  const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
