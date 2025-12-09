@@ -21,9 +21,9 @@ export function ThemeTestBackground() {
   }, [])
 
   return (
-    <div className="p-4 rounded-lg border">
-      <p className="font-medium">Body Background Color:</p>
-      <p className="text-lg font-mono">{bgColor}</p>
+    <div className="p-4 rounded-lg border border-soft bg-input-bg">
+      <p className="font-medium text-text-primary">Body Background Color:</p>
+      <p className="text-lg font-mono text-text-primary">{bgColor}</p>
     </div>
   )
 }

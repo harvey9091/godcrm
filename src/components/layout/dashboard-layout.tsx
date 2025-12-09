@@ -13,8 +13,7 @@ import {
   IconMenu,
   IconX,
   IconSettings,
-  IconRobot,
-  IconBrandTwitter
+  IconRobot
 } from '@tabler/icons-react'
 import { Toaster } from 'sonner'
 import { User } from '@supabase/supabase-js'
@@ -28,8 +27,7 @@ const navigation = [
 ]
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sidebarHover, setSidebarHover] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [user, setUser] = useState<User | null>(null)
   const pathname = usePathname()
   const router = useRouter()
@@ -63,12 +61,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-stone-black-1">
       {/* Background vignette for depth */}
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(30,30,45,0.6)_0%,rgba(15,15,30,0.9)_100%)] pointer-events-none z-0"></div>
       
       {/* Frosted container behind content */}
-      <div className="fixed inset-4 bg-white/5 backdrop-blur-3xl rounded-3xl border border-white/10 shadow-2xl pointer-events-none z-0"></div>
+      <div className="fixed inset-4 bg-stone-black-2/50 backdrop-blur-3xl rounded-3xl border border-soft shadow-stone pointer-events-none z-0"></div>
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
@@ -80,35 +78,27 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Sidebar */}
       <div 
-        className={`fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-          sidebarOpen ? 'translate-x-0 w-64' : sidebarHover ? 'w-64' : 'w-16'
-        }`}
-        onMouseEnter={() => setSidebarHover(true)}
-        onMouseLeave={() => setSidebarHover(false)}
+        className={`fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 w-64`}
       >
         <div 
-          className={`flex items-center justify-between h-16 px-4 border-b border-white/10 transition-all duration-300 rounded-t-3xl ${
-            sidebarOpen || sidebarHover ? 'bg-white/8 backdrop-blur-[20px]' : 'bg-white/5 backdrop-blur-xl'
-          }`}
+          className={`flex items-center justify-between h-16 px-4 border-b border-soft transition-all duration-300 rounded-t-3xl bg-stone-gradient-card backdrop-blur-[20px]`}
         >
-          {(sidebarOpen || sidebarHover) && (
+          {sidebarOpen && (
             <div className="flex items-center">
-              <AnimatedGradientText className="text-2xl font-bold text-white">
+              <AnimatedGradientText className="text-2xl font-bold text-text-primary">
                 GodCRM
               </AnimatedGradientText>
             </div>
           )}
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-1 rounded-md text-white hover:bg-white/10"
+            className="lg:hidden p-1 rounded-md text-text-primary hover:bg-hover-surface"
           >
             <IconX className="h-6 w-6" />
           </button>
         </div>
         <nav 
-          className={`flex-1 px-3 py-5 space-y-2 transition-all duration-300 ${
-            sidebarOpen || sidebarHover ? 'bg-white/8 backdrop-blur-[20px]' : 'bg-white/5 backdrop-blur-xl'
-          }`}
+          className={`flex-1 px-3 py-5 space-y-2 transition-all duration-300 bg-stone-gradient-card backdrop-blur-[20px]`}
         >
           {navigation.map((item) => {
             const Icon = item.icon
@@ -119,67 +109,59 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`flex items-center px-4 py-4 text-base font-medium rounded-[18px] transition-all duration-300 ${
                   isActive
-                    ? 'bg-gradient-to-r from-white/15 to-white/5 text-white shadow-lg border border-white/20'
-                    : 'text-white/80 hover:bg-white/10 hover:text-white hover:border-white/10'
-                } ${sidebarOpen || sidebarHover ? '' : 'justify-center'}`}
+                    ? 'bg-gradient-to-r from-stone-grey-deep to-stone-black-2 text-gold-accent shadow-gold-glow border border-soft'
+                    : 'text-text-secondary hover:bg-hover-surface hover:text-text-primary hover:border-soft'
+                }`}
               >
                 <div className={`p-2.5 rounded-xl transition-all duration-300 ${
                   isActive 
-                    ? 'bg-white/20 shadow-inner border border-white/10' 
-                    : 'bg-white/10'
-                } ${sidebarOpen || sidebarHover ? '' : 'mx-auto'}`}>
+                    ? 'bg-stone-grey-deep shadow-inner border border-soft text-gold-accent' 
+                    : 'bg-stone-black-2 text-text-secondary'
+                }`}>
                   <Icon className="h-6 w-6" />
                 </div>
-                {(sidebarOpen || sidebarHover) && (
-                  <span className="ml-4">{item.name}</span>
-                )}
+                <span className="ml-4">{item.name}</span>
               </a>
             )
           })}
         </nav>
         <div 
-          className={`p-5 border-t border-white/10 transition-all duration-300 rounded-b-3xl ${
-            sidebarOpen || sidebarHover ? 'bg-white/8 backdrop-blur-[20px]' : 'bg-white/5 backdrop-blur-xl'
-          }`}
+          className={`p-5 border-t border-soft transition-all duration-300 rounded-b-3xl bg-stone-gradient-card backdrop-blur-[20px]`}
         >
           {user && (
-            <div className={`flex items-center ${sidebarOpen || sidebarHover ? 'justify-between' : 'justify-center'}`}>
+            <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="h-12 w-12 rounded-[18px] bg-gradient-to-r from-white/20 to-white/10 flex items-center justify-center shadow-lg border border-white/10">
-                  <span className="text-white text-lg font-medium">
+                <div className="h-12 w-12 rounded-[18px] bg-gradient-to-r from-stone-grey-deep to-stone-black-2 flex items-center justify-center shadow-lg border border-soft">
+                  <span className="text-text-primary text-lg font-medium">
                     {(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'U').charAt(0).toUpperCase()}
                   </span>
                 </div>
-                {(sidebarOpen || sidebarHover) && (
-                  <div className="ml-4">
-                    <p className="text-base font-medium text-white truncate max-w-[140px]">
-                      {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
-                    </p>
-                  </div>
-                )}
+                <div className="ml-4">
+                  <p className="text-base font-medium text-text-primary truncate max-w-[140px]">
+                    {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
+                  </p>
+                </div>
               </div>
-              {(sidebarOpen || sidebarHover) && (
-                <Button
-                  onClick={handleSignOut}
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-white/10 h-10 w-10"
-                >
-                  <IconLogout className="h-6 w-6" />
-                </Button>
-              )}
+              <Button
+                onClick={handleSignOut}
+                variant="ghost"
+                size="icon"
+                className="text-text-primary hover:bg-hover-surface h-10 w-10"
+              >
+                <IconLogout className="h-6 w-6" />
+              </Button>
             </div>
           )}
         </div>
       </div>
 
       {/* Main content */}
-      <div className="flex flex-col flex-1 w-0 overflow-hidden relative z-10 border-l border-white/10">
+      <div className="flex flex-col flex-1 w-0 overflow-hidden relative z-10 border-l border-soft">
         {/* Mobile header */}
-        <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/10 bg-white/8 backdrop-blur-xl">
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-soft bg-stone-gradient-card backdrop-blur-xl">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-1 rounded-md text-white hover:bg-white/10"
+            className="p-1 rounded-md text-text-primary hover:bg-hover-surface"
           >
             <IconMenu className="h-6 w-6" />
           </button>
@@ -192,7 +174,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Page content with custom scrollbar */}
-        <main className="flex-1 overflow-y-auto focus:outline-none custom-scrollbar py-6 px-4 sm:px-6 lg:px-8">
+        <main className="flex-1 overflow-y-auto focus:outline-none custom-scrollbar py-6 px-4 sm:px-6 lg:px-8 bg-stone-black-1 min-h-screen">
           <div className="max-w-full mx-auto">
             {children}
           </div>

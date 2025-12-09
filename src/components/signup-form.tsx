@@ -59,10 +59,10 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   }
 
   return (
-    <Card {...props}>
+    <Card {...props} className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-text-primary">Create an account</CardTitle>
+        <CardDescription className="text-text-muted">
           Enter your information below to create your account
         </CardDescription>
       </CardHeader>
@@ -70,7 +70,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         <form onSubmit={handleSubmit}>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
+              <FieldLabel htmlFor="name" className="text-text-primary">Full Name</FieldLabel>
               <Input 
                 id="name" 
                 type="text" 
@@ -78,10 +78,11 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 required 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px]"
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <FieldLabel htmlFor="email" className="text-text-primary">Email</FieldLabel>
               <Input
                 id="email"
                 type="email"
@@ -89,27 +90,29 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px]"
               />
-              <FieldDescription>
+              <FieldDescription className="text-text-muted">
                 We&apos;ll use this to contact you. We will not share your email
                 with anyone else.
               </FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <FieldLabel htmlFor="password" className="text-text-primary">Password</FieldLabel>
               <Input 
                 id="password" 
                 type="password" 
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px]"
               />
-              <FieldDescription>
+              <FieldDescription className="text-text-muted">
                 Must be at least 8 characters long.
               </FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="confirm-password">
+              <FieldLabel htmlFor="confirm-password" className="text-text-primary">
                 Confirm Password
               </FieldLabel>
               <Input 
@@ -118,8 +121,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 required 
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px]"
               />
-              <FieldDescription>Please confirm your password.</FieldDescription>
+              <FieldDescription className="text-text-muted">Please confirm your password.</FieldDescription>
             </Field>
             {error && (
               <div className="text-red-500 text-sm">{error}</div>
@@ -129,11 +133,11 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 <RainbowButton type="submit" disabled={loading}>
                   {loading ? 'Creating Account...' : 'Create Account'}
                 </RainbowButton>
-                <Button variant="outline" type="button">
+                <Button variant="outline" type="button" className="border-soft text-text-primary hover:bg-hover-surface">
                   Sign up with Google
                 </Button>
-                <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href="/login">Sign in</a>
+                <FieldDescription className="px-6 text-center text-text-muted">
+                  Already have an account? <a href="/login" className="text-gold-accent hover:underline">Sign in</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>

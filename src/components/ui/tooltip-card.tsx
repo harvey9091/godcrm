@@ -138,10 +138,19 @@ export const Tooltip = ({
 
   // Update position when tooltip becomes visible or content changes
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     if (isVisible && contentRef.current) {
-      const newPosition = calculatePosition(mouse.x, mouse.y);
-      setPosition(newPosition);
+      // Use setTimeout to avoid cascading renders
+      timeoutId = setTimeout(() => {
+        const newPosition = calculatePosition(mouse.x, mouse.y);
+        setPosition(newPosition);
+      }, 0);
     }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [isVisible, height, mouse.x, mouse.y]);
 
   return (
@@ -168,7 +177,7 @@ export const Tooltip = ({
               stiffness: 200,
               damping: 20,
             }}
-            className="pointer-events-none absolute z-50 min-w-[15rem] overflow-hidden rounded-md border border-transparent bg-white shadow-sm ring-1 shadow-black/5 ring-black/5 dark:bg-neutral-900 dark:shadow-white/10 dark:ring-white/5"
+            className="pointer-events-none absolute z-50 min-w-[15rem] overflow-hidden rounded-md border border-soft bg-gradient-to-b from-obsidian-soft to-stone-black-2 shadow-stone ring-1 shadow-gold-glow ring-gold-glow"
             style={{
               top: position.y,
               left: position.x,
@@ -176,7 +185,7 @@ export const Tooltip = ({
           >
             <div
               ref={contentRef}
-              className="p-2 text-sm text-neutral-600 md:p-4 dark:text-neutral-400"
+              className="p-2 text-sm text-text-secondary md:p-4"
             >
               {content}
             </div>

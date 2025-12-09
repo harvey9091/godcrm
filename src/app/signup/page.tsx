@@ -29,16 +29,16 @@ export default function Page() {
 
   if (!isMounted) {
     return (
-      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-stone-black-1">
         <div className="w-full max-w-sm">
-          <div className="h-96 animate-pulse bg-gray-200 rounded-lg"></div>
+          <div className="h-96 animate-pulse bg-stone-grey-deep rounded-lg"></div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-stone-black-1">
       <div className="w-full max-w-sm">
         <SignupForm />
       </div>

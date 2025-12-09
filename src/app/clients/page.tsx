@@ -178,8 +178,8 @@ export default function ClientsPage() {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        <div className="flex items-center justify-center h-screen bg-stone-black-1">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-accent"></div>
         </div>
       </DashboardLayout>
     )
@@ -189,15 +189,15 @@ export default function ClientsPage() {
     <DashboardLayout>
       {/* Background video for Apple-style grainy effect */}
       <div className="fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(30,30,45,0.6)_0%,rgba(15,15,30,0.9)_100%)]"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjciIG51bU9jdGF2ZXM9IjEwIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIj48L2ZlVHVyYnVsZW5jZT48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ij48L3JlY3Q+PC9zdmc+')] opacity-20"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(29,29,33,0.8)_0%,rgba(10,10,12,0.95)_100%)]"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjciIG51bU9jdGF2ZXM9IjEwIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIj48L2ZlVHVyYnVsZW5jZT48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ij48L3JlY3Q+PC9zdmc+')] opacity-10"></div>
       </div>
       
       <div className="space-y-6 relative z-10 animate-fadeInUp">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white">Leads</h1>
-            <p className="text-white/70 mt-1">Manage your client leads and prospects</p>
+            <h1 className="text-3xl font-bold text-text-primary">Leads</h1>
+            <p className="text-text-muted mt-1">Manage your client leads and prospects</p>
           </div>
           <Button 
             onClick={() => {
@@ -212,7 +212,7 @@ export default function ClientsPage() {
                 router.push('/clients/new');
               }
             }}
-            className="bg-violet-600 hover:bg-violet-700 text-white rounded-[12px] flex items-center transition-all duration-300 transform hover:scale-105"
+            className="bg-gold-accent hover:bg-gold-dim text-stone-black-1 rounded-[12px] flex items-center transition-all duration-300 transform hover:scale-105"
           >
             <IconPlus className="mr-2 h-4 w-4" />
             Add New Client
@@ -222,24 +222,24 @@ export default function ClientsPage() {
         {/* Search and Filters Section - Added proper spacing */}
         <div className="space-y-6">
           {/* Search Bar */}
-          <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
+          <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
             <CardContent className="p-4">
               <div className="relative">
-                <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-5 w-5" />
+                <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted h-5 w-5" />
                 <Input
                   placeholder="Search clients by name, email, or company..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px] h-12"
+                  className="pl-10 bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px] h-12"
                 />
               </div>
             </CardContent>
           </Card>
 
           {/* Filters Section */}
-          <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
+          <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
             <CardHeader className="pb-3 pt-4">
-              <CardTitle className="text-lg font-semibold text-white flex items-center">
+              <CardTitle className="text-lg font-semibold text-text-primary flex items-center">
                 <IconFilter className="mr-2 h-5 w-5" />
                 Filters
               </CardTitle>
@@ -247,9 +247,9 @@ export default function ClientsPage() {
             <CardContent className="pb-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-white/80 mb-2 block">Lead Temperature</label>
+                  <label className="text-sm font-medium text-text-secondary mb-2 block">Lead Temperature</label>
                   <Select value={leadTempFilter} onValueChange={setLeadTempFilter}>
-                    <SelectTrigger className="bg-white/10 border-white/10 text-white rounded-[12px] h-10">
+                    <SelectTrigger className="bg-input-bg border-soft text-text-primary rounded-[12px] h-10">
                       <SelectValue placeholder="Select temperature" />
                     </SelectTrigger>
                     <SelectContent>
@@ -262,9 +262,9 @@ export default function ClientsPage() {
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium text-white/80 mb-2 block">Follow-up Status</label>
+                  <label className="text-sm font-medium text-text-secondary mb-2 block">Follow-up Status</label>
                   <Select value={followUpStatusFilter} onValueChange={setFollowUpStatusFilter}>
-                    <SelectTrigger className="bg-white/10 border-white/10 text-white rounded-[12px] h-10">
+                    <SelectTrigger className="bg-input-bg border-soft text-text-primary rounded-[12px] h-10">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -277,9 +277,9 @@ export default function ClientsPage() {
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium text-white/80 mb-2 block">Outreach Type</label>
+                  <label className="text-sm font-medium text-text-secondary mb-2 block">Outreach Type</label>
                   <Select value={outreachTypeFilter} onValueChange={setOutreachTypeFilter}>
-                    <SelectTrigger className="bg-white/10 border-white/10 text-white rounded-[12px] h-10">
+                    <SelectTrigger className="bg-input-bg border-soft text-text-primary rounded-[12px] h-10">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -295,15 +295,15 @@ export default function ClientsPage() {
           </Card>
 
           {/* Clients List Section */}
-          <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
+          <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
             <CardHeader className="pb-3 pt-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <CardTitle className="text-lg font-semibold text-white flex items-center">
+                <CardTitle className="text-lg font-semibold text-text-primary flex items-center">
                   <IconUsers className="mr-2 h-5 w-5" />
                   All Clients
                 </CardTitle>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-white/70">
+                  <span className="text-sm text-text-muted">
                     {filteredClients.length} client{filteredClients.length !== 1 ? 's' : ''}
                   </span>
                 </div>
@@ -315,29 +315,29 @@ export default function ClientsPage() {
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-white/10">
-                          <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Client</th>
-                          <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Status</th>
-                          <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Lead Temp</th>
-                          <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Follow-up</th>
-                          <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Socials</th>
-                          <th className="text-left py-3 px-2 text-white/80 font-medium text-sm">Actions</th>
+                        <tr className="border-b border-soft">
+                          <th className="text-left py-3 px-2 text-text-secondary font-medium text-sm">Client</th>
+                          <th className="text-left py-3 px-2 text-text-secondary font-medium text-sm">Status</th>
+                          <th className="text-left py-3 px-2 text-text-secondary font-medium text-sm">Lead Temp</th>
+                          <th className="text-left py-3 px-2 text-text-secondary font-medium text-sm">Follow-up</th>
+                          <th className="text-left py-3 px-2 text-text-secondary font-medium text-sm">Socials</th>
+                          <th className="text-left py-3 px-2 text-text-secondary font-medium text-sm">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {currentClients.map((client) => (
-                          <tr key={client.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                          <tr key={client.id} className="border-b border-soft hover:bg-hover-surface transition-colors">
                             <td className="py-3 px-2">
                               <div>
-                                <div className="font-medium text-white">{client.name}</div>
-                                <div className="text-sm text-white/70">{client.email}</div>
+                                <div className="font-medium text-text-primary">{client.name}</div>
+                                <div className="text-sm text-text-muted">{client.email}</div>
                                 {client.company && (
-                                  <div className="text-sm text-white/60">{client.company}</div>
+                                  <div className="text-sm text-text-disabled">{client.company}</div>
                                 )}
                               </div>
                             </td>
                             <td className="py-3 px-2">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium $[
                                 client.status === 'active' ? 'bg-green-100/20 text-green-300' :
                                 client.status === 'ongoing' ? 'bg-blue-100/20 text-blue-300' :
                                 client.status === 'closed' ? 'bg-purple-100/20 text-purple-300' :
@@ -347,7 +347,7 @@ export default function ClientsPage() {
                               </span>
                             </td>
                             <td className="py-3 px-2">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium $[
                                 client.lead_temp === 'hot' ? 'bg-red-100/20 text-red-300' :
                                 client.lead_temp === 'warm' ? 'bg-yellow-100/20 text-yellow-300' :
                                 'bg-blue-100/20 text-blue-300'
@@ -356,11 +356,11 @@ export default function ClientsPage() {
                               </span>
                             </td>
                             <td className="py-3 px-2">
-                              <div className="text-sm text-white/70">
+                              <div className="text-sm text-text-muted">
                                 {client.follow_up_status || 'N/A'}
                               </div>
                               {client.next_follow_up_date && (
-                                <div className="text-xs text-white/60">
+                                <div className="text-xs text-text-disabled">
                                   Next: {new Date(client.next_follow_up_date).toLocaleDateString()}
                                 </div>
                               )}
@@ -372,7 +372,7 @@ export default function ClientsPage() {
                                     href={client.youtube} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="text-white/70 hover:text-white transition-colors"
+                                    className="text-text-muted hover:text-gold-accent transition-colors"
                                     title="YouTube"
                                   >
                                     <IconBrandYoutube className="h-5 w-5" />
@@ -383,7 +383,7 @@ export default function ClientsPage() {
                                     href={client.instagram} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="text-white/70 hover:text-white transition-colors"
+                                    className="text-text-muted hover:text-gold-accent transition-colors"
                                     title="Instagram"
                                   >
                                     <IconBrandInstagram className="h-5 w-5" />
@@ -394,7 +394,7 @@ export default function ClientsPage() {
                                     href={client.twitter} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="text-white/70 hover:text-white transition-colors"
+                                    className="text-text-muted hover:text-gold-accent transition-colors"
                                     title="Twitter"
                                   >
                                     <IconBrandTwitter className="h-5 w-5" />
@@ -405,7 +405,7 @@ export default function ClientsPage() {
                                     href={client.linkedin} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="text-white/70 hover:text-white transition-colors"
+                                    className="text-text-muted hover:text-gold-accent transition-colors"
                                     title="LinkedIn"
                                   >
                                     <IconBrandLinkedin className="h-5 w-5" />
@@ -416,14 +416,14 @@ export default function ClientsPage() {
                                     href={client.tiktok} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="text-white/70 hover:text-white transition-colors"
+                                    className="text-text-muted hover:text-gold-accent transition-colors"
                                     title="TikTok"
                                   >
                                     <IconBrandTiktok className="h-5 w-5" />
                                   </a>
                                 )}
                                 {!client.youtube && !client.instagram && !client.twitter && !client.linkedin && !client.tiktok && (
-                                  <span className="text-white/30">
+                                  <span className="text-text-disabled">
                                     <IconLink className="h-5 w-5" />
                                   </span>
                                 )}
@@ -435,7 +435,7 @@ export default function ClientsPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleViewClient(client)}
-                                  className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10"
+                                  className="h-8 w-8 p-0 text-text-muted hover:text-gold-accent hover:bg-hover-surface"
                                 >
                                   <IconEye className="h-4 w-4" />
                                 </Button>
@@ -443,7 +443,7 @@ export default function ClientsPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleEditClient(client)}
-                                  className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10"
+                                  className="h-8 w-8 p-0 text-text-muted hover:text-gold-accent hover:bg-hover-surface"
                                 >
                                   <IconEdit className="h-4 w-4" />
                                 </Button>
@@ -452,10 +452,10 @@ export default function ClientsPage() {
                                   size="sm"
                                   onClick={() => handleDeleteClient(client)}
                                   disabled={deletingId === client.id}
-                                  className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10"
+                                  className="h-8 w-8 p-0 text-text-muted hover:text-gold-accent hover:bg-hover-surface"
                                 >
                                   {deletingId === client.id ? (
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gold-accent"></div>
                                   ) : (
                                     <IconTrash className="h-4 w-4" />
                                   )}
@@ -469,11 +469,11 @@ export default function ClientsPage() {
                   </div>
 
                   {/* Pagination Controls */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 pt-4 border-t border-white/10">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 pt-4 border-t border-soft">
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-white/70">Items per page:</span>
+                      <span className="text-sm text-text-muted">Items per page:</span>
                       <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                        <SelectTrigger className="bg-white/10 border-white/10 text-white rounded-[12px] h-8 w-20">
+                        <SelectTrigger className="bg-input-bg border-soft text-text-primary rounded-[12px] h-8 w-20">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -485,7 +485,7 @@ export default function ClientsPage() {
                     </div>
                     
                     <div className="flex items-center space-x-4">
-                      <span className="text-sm text-white/70">
+                      <span className="text-sm text-text-muted">
                         Page {currentPage} of {totalPages}
                       </span>
                       <div className="flex items-center space-x-1">
@@ -494,7 +494,7 @@ export default function ClientsPage() {
                           size="sm"
                           onClick={() => handlePageChange(currentPage - 1)}
                           disabled={currentPage === 1}
-                          className="border-white/20 text-white hover:bg-white/10 rounded-[12px] h-8 w-8 p-0"
+                          className="border-soft text-text-primary hover:bg-hover-surface rounded-[12px] h-8 w-8 p-0"
                         >
                           <IconChevronLeft className="h-4 w-4" />
                         </Button>
@@ -503,7 +503,7 @@ export default function ClientsPage() {
                           size="sm"
                           onClick={() => handlePageChange(currentPage + 1)}
                           disabled={currentPage === totalPages}
-                          className="border-white/20 text-white hover:bg-white/10 rounded-[12px] h-8 w-8 p-0"
+                          className="border-soft text-text-primary hover:bg-hover-surface rounded-[12px] h-8 w-8 p-0"
                         >
                           <IconChevronRight className="h-4 w-4" />
                         </Button>
@@ -513,9 +513,9 @@ export default function ClientsPage() {
                 </>
               ) : (
                 <div className="text-center py-12">
-                  <IconUsers className="mx-auto h-12 w-12 text-white/30 mb-4" />
-                  <h3 className="text-lg font-medium text-white mb-1">No clients found</h3>
-                  <p className="text-white/70 mb-4">
+                  <IconUsers className="mx-auto h-12 w-12 text-text-muted mb-4" />
+                  <h3 className="text-lg font-medium text-text-primary mb-1">No clients found</h3>
+                  <p className="text-text-secondary mb-4">
                     {clients.length > 0 
                       ? 'Try adjusting your search or filter criteria' 
                       : 'Get started by adding your first client'}
@@ -523,7 +523,7 @@ export default function ClientsPage() {
                   {clients.length === 0 && (
                     <Button 
                       onClick={() => router.push('/clients/new')}
-                      className="bg-violet-600 hover:bg-violet-700 text-white rounded-[12px]"
+                      className="bg-gold-accent hover:bg-gold-dim text-stone-black-1 rounded-[12px] flex items-center transition-all duration-300 transform hover:scale-105"
                     >
                       <IconPlus className="mr-2 h-4 w-4" />
                       Add Your First Client
@@ -561,20 +561,20 @@ export default function ClientsPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent className="bg-white/10 backdrop-blur-[20px] border border-white/15 rounded-[18px] max-w-md">
+        <DialogContent className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-white">Confirm Deletion</DialogTitle>
-            <DialogDescription className="text-white/70">
+            <DialogTitle className="text-text-primary">Confirm Deletion</DialogTitle>
+            <DialogDescription className="text-text-secondary">
               Are you sure you want to delete this client? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             {clientToDelete && (
-              <div className="flex items-center p-3 rounded-lg bg-white/5 border border-white/10">
+              <div className="flex items-center p-3 rounded-lg bg-input-bg border border-soft">
                 <IconAlertTriangle className="h-5 w-5 text-yellow-400 mr-3" />
                 <div>
-                  <div className="font-medium text-white">{clientToDelete.name}</div>
-                  <div className="text-sm text-white/70">{clientToDelete.email}</div>
+                  <div className="font-medium text-text-primary">{clientToDelete.name}</div>
+                  <div className="text-sm text-text-secondary">{clientToDelete.email}</div>
                 </div>
               </div>
             )}
@@ -583,13 +583,13 @@ export default function ClientsPage() {
             <Button
               variant="outline"
               onClick={() => setDeleteConfirmOpen(false)}
-              className="border-white/20 text-white hover:bg-white/10 rounded-[12px]"
+              className="border-soft text-text-primary hover:bg-hover-surface rounded-[12px]"
             >
               Cancel
             </Button>
             <Button
               onClick={confirmDeleteClient}
-              className="bg-red-600 hover:bg-red-700 text-white rounded-[12px]"
+              className="bg-red-600 hover:bg-red-700 text-text-primary rounded-[12px]"
             >
               Delete Client
             </Button>

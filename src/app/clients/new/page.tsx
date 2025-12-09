@@ -158,8 +158,8 @@ export default function NewClientPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      <div className="flex items-center justify-center h-screen bg-stone-black-1">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-accent"></div>
       </div>
     )
   }
@@ -168,25 +168,25 @@ export default function NewClientPage() {
     <DashboardLayout>
       {/* Background video for Apple-style grainy effect */}
       <div className="fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(30,30,45,0.6)_0%,rgba(15,15,30,0.9)_100%)]"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjciIG51bU9jdGF2ZXM9IjEwIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIj48L2ZlVHVyYnVsZW5jZT48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ij48L3JlY3Q+PC9zdmc+')] opacity-20"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(29,29,33,0.8)_0%,rgba(10,10,12,0.95)_100%)]"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjciIG51bU9jdGF2ZXM9IjEwIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIj48L2ZlVHVyYnVsZW5jZT48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ij48L3JlY3Q+PC9zdmc+')] opacity-10"></div>
       </div>
       
       <div className="space-y-6 relative z-10 animate-fadeInUp">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl font-bold text-text-primary">
             <AnimatedGradientText className="text-3xl font-bold">
               Add New Client
             </AnimatedGradientText>
           </h1>
-          <Button onClick={() => router.back()} variant="outline" className="h-10 rounded-lg">
+          <Button onClick={() => router.back()} variant="outline" className="h-10 rounded-lg border-soft text-text-primary hover:bg-hover-surface">
             Back to Clients
           </Button>
         </div>
 
-        <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
+        <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
           <CardHeader className="pb-4 pt-5">
-            <CardTitle>Add New Client for Outreach</CardTitle>
+            <CardTitle className="text-text-primary">Add New Client for Outreach</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -194,27 +194,27 @@ export default function NewClientPage() {
                 {/* Left Column */}
                 <div className="space-y-6">
                   {/* Client Info Panel */}
-                  <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
+                  <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
                     <CardHeader className="pb-4 pt-5">
-                      <CardTitle className="text-lg flex items-center">
+                      <CardTitle className="text-lg flex items-center text-text-primary">
                         <IconUser className="mr-2 h-5 w-5" />
                         Client Info
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-3">
-                        <Label htmlFor="name">Client Name *</Label>
+                        <Label htmlFor="name" className="text-text-primary">Client Name *</Label>
                         <Input
                           id="name"
                           required
                           value={formData.name}
                           onChange={(e) => handleChange('name', e.target.value)}
                           placeholder="Enter client name"
-                          className="h-11 rounded-xl"
+                          className="h-11 rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                         />
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="email">Primary Contact Email *</Label>
+                        <Label htmlFor="email" className="text-text-primary">Primary Contact Email *</Label>
                         <Input
                           id="email"
                           type="email"
@@ -222,43 +222,43 @@ export default function NewClientPage() {
                           value={formData.email}
                           onChange={(e) => handleChange('email', e.target.value)}
                           placeholder="Enter email address"
-                          className="h-11 rounded-xl"
+                          className="h-11 rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                         />
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="company">Company / Brand</Label>
+                        <Label htmlFor="company" className="text-text-primary">Company / Brand</Label>
                         <Input
                           id="company"
                           value={formData.company}
                           onChange={(e) => handleChange('company', e.target.value)}
                           placeholder="Enter company or brand name"
-                          className="h-11 rounded-xl"
+                          className="h-11 rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                         />
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="primary_contact">Primary Point of Contact</Label>
+                        <Label htmlFor="primary_contact" className="text-text-primary">Primary Point of Contact</Label>
                         <Input
                           id="primary_contact"
                           value={formData.primary_contact}
                           onChange={(e) => handleChange('primary_contact', e.target.value)}
                           placeholder="Enter primary contact name"
-                          className="h-11 rounded-xl"
+                          className="h-11 rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                         />
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Socials & Stats Panel */}
-                  <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
+                  <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
                     <CardHeader className="pb-4 pt-5">
-                      <CardTitle className="text-lg flex items-center">
+                      <CardTitle className="text-lg flex items-center text-text-primary">
                         <IconLink className="mr-2 h-5 w-5" />
                         Socials & Stats
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-3">
-                        <Label htmlFor="youtube" className="flex items-center">
+                        <Label htmlFor="youtube" className="flex items-center text-text-primary">
                           <IconBrandYoutube className="mr-2 h-5 w-5 text-red-600" />
                           YouTube Channel Link
                         </Label>
@@ -271,25 +271,25 @@ export default function NewClientPage() {
                             value={formData.youtube}
                             onChange={(e) => handleChange('youtube', e.target.value)}
                             placeholder="https://youtube.com/channel/..."
-                            className="h-11 rounded-xl pl-10"
+                            className="h-11 rounded-xl pl-10 bg-input-bg border-soft text-text-primary placeholder-text-muted"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-3">
-                          <Label htmlFor="subscriber_count">Subscriber Count</Label>
+                          <Label htmlFor="subscriber_count" className="text-text-primary">Subscriber Count</Label>
                           <Input
                             id="subscriber_count"
                             type="number"
                             value={formData.subscriber_count}
                             onChange={(e) => handleChange('subscriber_count', e.target.value)}
                             placeholder="e.g., 53200"
-                            className="h-11 rounded-xl"
+                            className="h-11 rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                           />
                         </div>
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="instagram" className="flex items-center">
+                        <Label htmlFor="instagram" className="flex items-center text-text-primary">
                           <IconBrandInstagram className="mr-2 h-5 w-5 text-pink-500" />
                           Instagram Link
                         </Label>
@@ -302,12 +302,12 @@ export default function NewClientPage() {
                             value={formData.instagram}
                             onChange={(e) => handleChange('instagram', e.target.value)}
                             placeholder="https://instagram.com/..."
-                            className="h-11 rounded-xl pl-10"
+                            className="h-11 rounded-xl pl-10 bg-input-bg border-soft text-text-primary placeholder-text-muted"
                           />
                         </div>
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="twitter" className="flex items-center">
+                        <Label htmlFor="twitter" className="flex items-center text-text-primary">
                           <IconBrandTwitter className="mr-2 h-5 w-5 text-blue-400" />
                           Twitter Link
                         </Label>
@@ -320,12 +320,12 @@ export default function NewClientPage() {
                             value={formData.twitter}
                             onChange={(e) => handleChange('twitter', e.target.value)}
                             placeholder="https://twitter.com/..."
-                            className="h-11 rounded-xl pl-10"
+                            className="h-11 rounded-xl pl-10 bg-input-bg border-soft text-text-primary placeholder-text-muted"
                           />
                         </div>
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="tiktok" className="flex items-center">
+                        <Label htmlFor="tiktok" className="flex items-center text-text-primary">
                           <IconBrandTiktok className="mr-2 h-5 w-5" />
                           TikTok Link
                         </Label>
@@ -338,12 +338,12 @@ export default function NewClientPage() {
                             value={formData.tiktok}
                             onChange={(e) => handleChange('tiktok', e.target.value)}
                             placeholder="https://tiktok.com/..."
-                            className="h-11 rounded-xl pl-10"
+                            className="h-11 rounded-xl pl-10 bg-input-bg border-soft text-text-primary placeholder-text-muted"
                           />
                         </div>
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="linkedin" className="flex items-center">
+                        <Label htmlFor="linkedin" className="flex items-center text-text-primary">
                           <IconBrandLinkedin className="mr-2 h-5 w-5 text-blue-600" />
                           LinkedIn Link
                         </Label>
@@ -356,12 +356,12 @@ export default function NewClientPage() {
                             value={formData.linkedin}
                             onChange={(e) => handleChange('linkedin', e.target.value)}
                             placeholder="https://linkedin.com/..."
-                            className="h-11 rounded-xl pl-10"
+                            className="h-11 rounded-xl pl-10 bg-input-bg border-soft text-text-primary placeholder-text-muted"
                           />
                         </div>
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="drive_link" className="flex items-center">
+                        <Label htmlFor="drive_link" className="flex items-center text-text-primary">
                           <IconCloudUpload className="mr-2 h-5 w-5" />
                           Value Link (Drive / Loom)
                         </Label>
@@ -374,12 +374,12 @@ export default function NewClientPage() {
                             value={formData.drive_link}
                             onChange={(e) => handleChange('drive_link', e.target.value)}
                             placeholder="https://drive.google.com/... or https://loom.com/..."
-                            className="h-11 rounded-xl pl-10"
+                            className="h-11 rounded-xl pl-10 bg-input-bg border-soft text-text-primary placeholder-text-muted"
                           />
                         </div>
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="website" className="flex items-center">
+                        <Label htmlFor="website" className="flex items-center text-text-primary">
                           <IconLink className="mr-2 h-5 w-5" />
                           Website
                         </Label>
@@ -392,7 +392,7 @@ export default function NewClientPage() {
                             value={formData.website}
                             onChange={(e) => handleChange('website', e.target.value)}
                             placeholder="https://yourwebsite.com"
-                            className="h-11 rounded-xl pl-10"
+                            className="h-11 rounded-xl pl-10 bg-input-bg border-soft text-text-primary placeholder-text-muted"
                           />
                         </div>
                       </div>
@@ -403,21 +403,21 @@ export default function NewClientPage() {
                 {/* Right Column */}
                 <div className="space-y-6">
                   {/* Outreach Details Panel */}
-                  <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
+                  <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
                     <CardHeader className="pb-4 pt-5">
-                      <CardTitle className="text-lg flex items-center">
+                      <CardTitle className="text-lg flex items-center text-text-primary">
                         <IconMail className="mr-2 h-5 w-5" />
                         Outreach Details
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-3">
-                        <Label htmlFor="outreach_type">Outreach Type</Label>
+                        <Label htmlFor="outreach_type" className="text-text-primary">Outreach Type</Label>
                         <Select
                           value={formData.outreach_type}
                           onValueChange={(value) => handleChange('outreach_type', value)}
                         >
-                          <SelectTrigger className="h-11 rounded-xl">
+                          <SelectTrigger className="h-11 rounded-xl bg-input-bg border-soft text-text-primary">
                             <SelectValue placeholder="Select outreach type" />
                           </SelectTrigger>
                           <SelectContent>
@@ -428,12 +428,12 @@ export default function NewClientPage() {
                         </Select>
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="outreach_platform">Outreach Platform</Label>
+                        <Label htmlFor="outreach_platform" className="text-text-primary">Outreach Platform</Label>
                         <Select
                           value={formData.outreach_platform}
                           onValueChange={(value) => handleChange('outreach_platform', value)}
                         >
-                          <SelectTrigger className="h-11 rounded-xl">
+                          <SelectTrigger className="h-11 rounded-xl bg-input-bg border-soft text-text-primary">
                             <SelectValue placeholder="Select platform" />
                           </SelectTrigger>
                           <SelectContent>
@@ -446,43 +446,43 @@ export default function NewClientPage() {
                         </Select>
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="outreach_date">Outreach Date</Label>
+                        <Label htmlFor="outreach_date" className="text-text-primary">Outreach Date</Label>
                         <Input
                           id="outreach_date"
                           type="date"
                           value={formData.outreach_date}
                           onChange={(e) => handleChange('outreach_date', e.target.value)}
-                          className="h-11 rounded-xl"
+                          className="h-11 rounded-xl bg-input-bg border-soft text-text-primary"
                         />
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="outreach_link_sent">Outreach Link Sent</Label>
+                        <Label htmlFor="outreach_link_sent" className="text-text-primary">Outreach Link Sent</Label>
                         <Input
                           id="outreach_link_sent"
                           value={formData.outreach_link_sent}
                           onChange={(e) => handleChange('outreach_link_sent', e.target.value)}
                           placeholder="https://your-special-page.com/..."
-                          className="h-11 rounded-xl"
+                          className="h-11 rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                         />
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="outreach_notes">Outreach Notes</Label>
+                        <Label htmlFor="outreach_notes" className="text-text-primary">Outreach Notes</Label>
                         <Textarea
                           id="outreach_notes"
                           value={formData.outreach_notes}
                           onChange={(e) => handleChange('outreach_notes', e.target.value)}
                           placeholder="Brief note about what was sent"
                           rows={4}
-                          className="rounded-xl"
+                          className="rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                         />
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Follow-up Tracking Panel */}
-                  <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
+                  <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
                     <CardHeader className="pb-4 pt-5">
-                      <CardTitle className="text-lg flex items-center justify-between">
+                      <CardTitle className="text-lg flex items-center justify-between text-text-primary">
                         <span className="flex items-center">
                           <IconCalendar className="mr-2 h-5 w-5" />
                           Follow-up Tracking
@@ -504,12 +504,12 @@ export default function NewClientPage() {
                     <CardContent className="space-y-6">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-3">
-                          <Label htmlFor="lead_temp">Lead Temperature</Label>
+                          <Label htmlFor="lead_temp" className="text-text-primary">Lead Temperature</Label>
                           <Select
                             value={formData.lead_temp}
                             onValueChange={(value) => handleChange('lead_temp', value as Client['lead_temp'])}
                           >
-                            <SelectTrigger className="h-11 rounded-xl">
+                            <SelectTrigger className="h-11 rounded-xl bg-input-bg border-soft text-text-primary">
                               <SelectValue placeholder="Select temperature" />
                             </SelectTrigger>
                             <SelectContent>
@@ -520,12 +520,12 @@ export default function NewClientPage() {
                           </Select>
                         </div>
                         <div className="space-y-3">
-                          <Label htmlFor="did_reply">Did they reply?</Label>
+                          <Label htmlFor="did_reply" className="text-text-primary">Did they reply?</Label>
                           <Select
                             value={formData.did_reply}
                             onValueChange={(value) => handleChange('did_reply', value)}
                           >
-                            <SelectTrigger className="h-11 rounded-xl">
+                            <SelectTrigger className="h-11 rounded-xl bg-input-bg border-soft text-text-primary">
                               <SelectValue placeholder="Select reply status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -539,12 +539,12 @@ export default function NewClientPage() {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-3">
-                          <Label htmlFor="follow_up_status">Follow-up Status</Label>
+                          <Label htmlFor="follow_up_status" className="text-text-primary">Follow-up Status</Label>
                           <Select
                             value={formData.follow_up_status}
                             onValueChange={(value) => handleChange('follow_up_status', value)}
                           >
-                            <SelectTrigger className="h-11 rounded-xl">
+                            <SelectTrigger className="h-11 rounded-xl bg-input-bg border-soft text-text-primary">
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent>
@@ -555,7 +555,7 @@ export default function NewClientPage() {
                           </Select>
                         </div>
                         <div className="space-y-3">
-                          <Label htmlFor="follow_up_count">Follow-up Count</Label>
+                          <Label htmlFor="follow_up_count" className="text-text-primary">Follow-up Count</Label>
                           <div className="flex items-center">
                             <Button 
                               type="button" 
@@ -563,11 +563,11 @@ export default function NewClientPage() {
                               size="icon" 
                               onClick={decrementFollowUpCount}
                               disabled={formData.follow_up_count <= 0}
-                              className="h-9 w-9 rounded-lg"
+                              className="h-9 w-9 rounded-lg border-soft text-text-primary hover:bg-hover-surface"
                             >
                               <IconMinus className="h-4 w-4" />
                             </Button>
-                            <div className="mx-3 w-10 text-center">
+                            <div className="mx-3 w-10 text-center text-text-primary">
                               {formData.follow_up_count}
                             </div>
                             <Button 
@@ -575,7 +575,7 @@ export default function NewClientPage() {
                               variant="outline" 
                               size="icon" 
                               onClick={incrementFollowUpCount}
-                              className="h-9 w-9 rounded-lg"
+                              className="h-9 w-9 rounded-lg border-soft text-text-primary hover:bg-hover-surface"
                             >
                               <IconPlus className="h-4 w-4" />
                             </Button>
@@ -583,33 +583,33 @@ export default function NewClientPage() {
                         </div>
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="platforms_followed_up_on">Platforms Followed Up On</Label>
+                        <Label htmlFor="platforms_followed_up_on" className="text-text-primary">Platforms Followed Up On</Label>
                         <Input
                           id="platforms_followed_up_on"
                           value={formData.platforms_followed_up_on}
                           onChange={(e) => handleChange('platforms_followed_up_on', e.target.value)}
                           placeholder="e.g., Email, Twitter, IG"
-                          className="h-11 rounded-xl"
+                          className="h-11 rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                         />
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="next_follow_up_date">Next Follow-up Date</Label>
+                        <Label htmlFor="next_follow_up_date" className="text-text-primary">Next Follow-up Date</Label>
                         <Input
                           id="next_follow_up_date"
                           type="date"
                           value={formData.next_follow_up_date}
                           onChange={(e) => handleChange('next_follow_up_date', e.target.value)}
-                          className="h-11 rounded-xl"
+                          className="h-11 rounded-xl bg-input-bg border-soft text-text-primary"
                         />
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="first_outreach_date">First Outreach Date</Label>
+                        <Label htmlFor="first_outreach_date" className="text-text-primary">First Outreach Date</Label>
                         <Input
                           id="first_outreach_date"
                           type="date"
                           value={formData.first_outreach_date}
                           onChange={(e) => handleChange('first_outreach_date', e.target.value)}
-                          className="h-11 rounded-xl"
+                          className="h-11 rounded-xl bg-input-bg border-soft text-text-primary"
                         />
                       </div>
                     </CardContent>
@@ -618,50 +618,50 @@ export default function NewClientPage() {
               </div>
 
               {/* Notes Panel (Collapsible) */}
-              <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg">
+              <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
                 <CardHeader 
                   className="pb-4 pt-5 cursor-pointer flex flex-row items-center justify-between"
                   onClick={() => toggleSection('notes')}
                 >
-                  <CardTitle className="text-lg flex items-center">
+                  <CardTitle className="text-lg flex items-center text-text-primary">
                     <IconNotes className="mr-2 h-5 w-5" />
                     Notes / Research
                   </CardTitle>
                   <IconChevronDown 
-                    className={`h-5 w-5 transition-transform ${expandedSections.notes ? 'rotate-180' : ''}`} 
+                    className={`h-5 w-5 transition-transform text-text-primary ${expandedSections.notes ? 'rotate-180' : ''}`} 
                   />
                 </CardHeader>
                 {expandedSections.notes && (
                   <CardContent className="space-y-6 pb-5">
                     <div className="space-y-3">
-                      <Label htmlFor="source">Source</Label>
+                      <Label htmlFor="source" className="text-text-primary">Source</Label>
                       <Input
                         id="source"
                         value={formData.source}
                         onChange={(e) => handleChange('source', e.target.value)}
                         placeholder="How were they found?"
-                        className="h-11 rounded-xl"
+                        className="h-11 rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                       />
                     </div>
                     <div className="space-y-3">
-                      <Label htmlFor="tags">Tags</Label>
+                      <Label htmlFor="tags" className="text-text-primary">Tags</Label>
                       <Input
                         id="tags"
                         value={formData.tags}
                         onChange={(e) => handleChange('tags', e.target.value)}
                         placeholder="e.g., priority, niche"
-                        className="h-11 rounded-xl"
+                        className="h-11 rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                       />
                     </div>
                     <div className="space-y-3">
-                      <Label htmlFor="notes">Notes / Research</Label>
+                      <Label htmlFor="notes" className="text-text-primary">Notes / Research</Label>
                       <Textarea
                         id="notes"
                         value={formData.notes}
                         onChange={(e) => handleChange('notes', e.target.value)}
                         placeholder="Paste research, email drafts, and other notes here..."
                         rows={6}
-                        className="rounded-xl"
+                        className="rounded-xl bg-input-bg border-soft text-text-primary placeholder-text-muted"
                       />
                     </div>
                   </CardContent>
@@ -675,7 +675,7 @@ export default function NewClientPage() {
                   variant="outline" 
                   onClick={() => router.back()}
                   disabled={saving}
-                  className="h-11 px-5 rounded-xl"
+                  className="h-11 px-5 rounded-xl border-soft text-text-primary hover:bg-hover-surface"
                 >
                   Cancel
                 </Button>

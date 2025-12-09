@@ -1,0 +1,140 @@
+/* Stone Gradient Theme Styles */
+
+/* Base background */
+.stone-bg {
+  background: linear-gradient(135deg, #0A0A0C 0%, #18181A 100%);
+}
+
+/* Card backgrounds with subtle gradients */
+.stone-card-bg {
+  background: linear-gradient(to bottom, #1D1D21, #111113);
+}
+
+/* Gold accent elements */
+.gold-accent {
+  color: #C8A25F;
+}
+
+.gold-bg {
+  background-color: #C8A25F;
+}
+
+.gold-border {
+  border-color: #C8A25F;
+}
+
+/* Text colors */
+.text-primary {
+  color: #F2F2F2;
+}
+
+.text-secondary {
+  color: #C9C9C9;
+}
+
+.text-muted {
+  color: #8B8B8B;
+}
+
+.text-disabled {
+  color: #5F5F5F;
+}
+
+/* Border colors */
+.border-soft {
+  border-color: #2F2F2F;
+}
+
+/* Hover states */
+.hover-gold:hover {
+  color: #C8A25F;
+}
+
+.hover-stone:hover {
+  background-color: #222225;
+}
+
+/* Shadows */
+.shadow-stone {
+  box-shadow: 0 4px 12px 0 rgba(0,0,0,0.45);
+}
+
+.shadow-stone-lg {
+  box-shadow: 0 8px 24px 0 rgba(0,0,0,0.45);
+}
+
+.shadow-stone-xl {
+  box-shadow: 0 12px 32px 0 rgba(0,0,0,0.45);
+}
+
+/* Gold glow effects */
+.gold-glow {
+  box-shadow: 0 0 8px rgba(200,162,95,0.12);
+}
+
+.gold-glow-md {
+  box-shadow: 0 0 16px rgba(200,162,95,0.12);
+}
+
+.gold-glow-lg {
+  box-shadow: 0 0 24px rgba(200,162,95,0.12);
+}
+
+/* Custom scrollbar */
+.stone-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.stone-scrollbar::-webkit-scrollbar-track {
+  background: rgba(42, 42, 46, 0.1);
+  border-radius: 10px;
+}
+
+.stone-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #C8A25F, #9A804B);
+  border-radius: 10px;
+  box-shadow: 0 0 4px rgba(200, 162, 95, 0.3);
+}
+
+.stone-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #9A804B, #C8A25F);
+  box-shadow: 0 0 8px rgba(200, 162, 95, 0.5);
+}
+
+/* Transitions */
+.transition-stone {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Utility classes for gradients */
+.bg-stone-gradient-dark {
+  background: linear-gradient(to bottom, #111113, #18181A);
+}
+
+.bg-stone-gradient-diagonal {
+  background: linear-gradient(135deg, #0A0A0C, #232326);
+}
+
+.bg-stone-gradient-card {
+  background: linear-gradient(to bottom, #1D1D21, #111113);
+}
+
+.bg-gold-glow {
+  background: linear-gradient(90deg, rgba(200,162,95,0.12), rgba(200,162,95,0.06), rgba(200,162,95,0.12));
+}

@@ -56,10 +56,10 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-text-primary">Login to your account</CardTitle>
+          <CardDescription className="text-text-muted">
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
@@ -67,7 +67,7 @@ export function LoginForm({
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email" className="text-text-primary">Email</FieldLabel>
                 <Input
                   id="email"
                   type="email"
@@ -75,14 +75,15 @@ export function LoginForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px]"
                 />
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password" className="text-text-primary">Password</FieldLabel>
                   <a
                     href="/signup"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                    className="ml-auto inline-block text-sm text-gold-accent hover:underline"
                   >
                     Forgot your password?
                   </a>
@@ -93,6 +94,7 @@ export function LoginForm({
                   required 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px]"
                 />
               </Field>
               {error && (
@@ -102,11 +104,11 @@ export function LoginForm({
                 <RainbowButton type="submit" disabled={loading}>
                   {loading ? 'Logging in...' : 'Login'}
                 </RainbowButton>
-                <Button variant="outline" type="button">
+                <Button variant="outline" type="button" className="border-soft text-text-primary hover:bg-hover-surface">
                   Login with Google
                 </Button>
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="/signup">Sign up</a>
+                <FieldDescription className="text-center text-text-muted">
+                  Don&apos;t have an account? <a href="/signup" className="text-gold-accent hover:underline">Sign up</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>

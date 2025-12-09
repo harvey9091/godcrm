@@ -66,7 +66,7 @@ export default function DebugTablesPage() {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-full">
-          <div className="text-white">Loading...</div>
+          <div className="text-text-primary">Loading...</div>
         </div>
       </DashboardLayout>
     )
@@ -77,12 +77,12 @@ export default function DebugTablesPage() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white">Supabase Debug</h1>
-            <p className="text-white/70 mt-1">Debug database tables and connections</p>
+            <h1 className="text-3xl font-bold text-text-primary">Supabase Debug</h1>
+            <p className="text-text-secondary mt-1">Debug database tables and connections</p>
           </div>
           <Button 
             onClick={runDebug}
-            className="bg-violet-600 hover:bg-violet-700 text-white rounded-[12px] flex items-center"
+            className="bg-gold-accent hover:bg-gold-dim text-stone-black-1 rounded-[12px] flex items-center transition-all duration-300 hover:scale-105"
           >
             <IconRefresh className="mr-2 h-4 w-4" />
             Run Debug
@@ -92,32 +92,32 @@ export default function DebugTablesPage() {
         {error && (
           <Card className="bg-red-500/20 border border-red-500/30 rounded-[18px]">
             <CardHeader>
-              <CardTitle className="text-white flex items-center">
+              <CardTitle className="text-text-primary flex items-center">
                 <IconAlertCircle className="mr-2 h-5 w-5" />
                 Error
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-white">{error}</p>
+              <p className="text-text-primary">{error}</p>
             </CardContent>
           </Card>
         )}
 
-        <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px]">
+        <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
+            <CardTitle className="text-text-primary flex items-center">
               <IconDatabase className="mr-2 h-5 w-5" />
               Debug Output
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="bg-black/20 rounded-lg p-4 h-96 overflow-y-auto custom-scrollbar">
+            <div className="bg-input-bg rounded-lg p-4 h-96 overflow-y-auto custom-scrollbar">
               {debugOutput.length > 0 ? (
-                <pre className="text-white text-sm whitespace-pre-wrap">
+                <pre className="text-text-primary text-sm whitespace-pre-wrap">
                   {debugOutput.join('\n')}
                 </pre>
               ) : (
-                <p className="text-white/50 italic">
+                <p className="text-text-muted italic">
                   Click &quot;Run Debug&quot; to start the database debugging process
                 </p>
               )}

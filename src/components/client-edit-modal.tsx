@@ -112,6 +112,7 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
 
 
 
+
   // Function to compare objects and find changed fields
   const getChangedFields = (original: Partial<Client>, updated: Partial<Client>): Record<string, { old: unknown; new: unknown }> => {
     const changes: Record<string, { old: unknown; new: unknown }> = {}
@@ -225,7 +226,7 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent 
-        className="!w-[80vw] !max-w-[1600px] !min-w-[70vw] h-[85vh] rounded-[18px] overflow-hidden shadow-2xl backdrop-blur-[20px] bg-white/10 border border-white/15 p-0 transition-all duration-300"
+        className="!w-[80vw] !max-w-[1600px] !min-w-[70vw] h-[85vh] rounded-[18px] overflow-hidden shadow-stone backdrop-blur-[20px] bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft p-0 transition-all duration-300"
         style={{
           animation: open ? 'modalEnter 300ms cubic-bezier(0.34, 1.56, 0.64, 1)' : 'modalExit 200ms ease-in'
         }}
@@ -262,44 +263,44 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
             border-radius: 10px;
           }
           .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #9b5cff, #8b5cf6);
+            background: linear-gradient(180deg, #C8A25F, #9A804B);
             border-radius: 10px;
-            box-shadow: 0 0 4px rgba(155, 92, 255, 0.5);
+            box-shadow: 0 0 4px rgba(200, 162, 95, 0.5);
           }
           .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #8b5cf6, #9b5cff);
+            background: linear-gradient(180deg, #9A804B, #C8A25F);
           }
         `}</style>
         
         {/* Custom Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 z-10 backdrop-blur-sm border border-white/10"
+          className="absolute top-4 right-4 p-2 rounded-full bg-hover-surface hover:bg-input-bg transition-all duration-300 z-10 backdrop-blur-sm border border-soft"
         >
-          <IconX className="w-5 h-5 text-white" />
+          <IconX className="w-5 h-5 text-text-primary" />
         </button>
         
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="bg-gradient-to-r from-violet-900/20 to-purple-900/20 p-6 border-b border-white/10 backdrop-blur-sm flex-shrink-0">
+          <div className="bg-gradient-to-r from-stone-grey-deep to-stone-black-2 p-6 border-b border-soft backdrop-blur-sm flex-shrink-0">
             <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-white">Edit Client: {client.name}</h1>
+              <h1 className="text-2xl font-bold text-text-primary">Edit Client: {client.name}</h1>
               <div className="flex gap-3">
                 <Button 
                   variant="outline" 
                   onClick={onClose}
-                  className="border-white/20 hover:bg-white/10 text-white rounded-[12px]"
+                  className="border-soft hover:bg-hover-surface text-text-primary rounded-[12px] transition-colors"
                 >
                   Cancel
                 </Button>
                 <Button 
                   onClick={handleSave}
                   disabled={isSaving || !hasUnsavedChanges}
-                  className="bg-violet-600 hover:bg-violet-700 text-white rounded-[12px] transition-all duration-300 hover:scale-[1.02] flex items-center"
+                  className="bg-gold-accent hover:bg-gold-dim text-stone-black-1 rounded-[12px] transition-all duration-300 hover:scale-[1.02] flex items-center"
                 >
                   {isSaving ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-stone-black-1 mr-2"></div>
                       Saving...
                     </>
                   ) : (
@@ -334,64 +335,64 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
               {/* Left Column - Basic Info */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Basic Information */}
-                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
-                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <IconUser className="w-5 h-5 text-violet-400" />
+                <div className="bg-input-bg backdrop-blur-sm rounded-[18px] border border-soft p-6">
+                  <h2 className="text-xl font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <IconUser className="w-5 h-5 text-gold-accent" />
                     Basic Information
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-white">Name</Label>
+                      <Label htmlFor="name" className="text-text-primary">Name</Label>
                       <Input
                         id="name"
                         value={formData.name || ''}
                         onChange={(e) => handleChange('name', e.target.value)}
-                        className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
+                        className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px] focus:ring-2 focus:ring-gold-glow"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-white">Email</Label>
+                      <Label htmlFor="email" className="text-text-primary">Email</Label>
                       <Input
                         id="email"
                         type="email"
                         value={formData.email || ''}
                         onChange={(e) => handleChange('email', e.target.value as Client['email'])}
-                        className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
+                        className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px] focus:ring-2 focus:ring-gold-glow"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="company" className="text-white">Company</Label>
+                      <Label htmlFor="company" className="text-text-primary">Company</Label>
                       <Input
                         id="company"
                         value={formData.company || ''}
                         onChange={(e) => handleChange('company', e.target.value)}
-                        className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
+                        className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px] focus:ring-2 focus:ring-gold-glow"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="primary_contact" className="text-white">Primary Contact</Label>
+                      <Label htmlFor="primary_contact" className="text-text-primary">Primary Contact</Label>
                       <Input
                         id="primary_contact"
                         value={formData.primary_contact || ''}
                         onChange={(e) => handleChange('primary_contact', e.target.value)}
-                        className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
+                        className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px] focus:ring-2 focus:ring-gold-glow"
                       />
                     </div>
                   </div>
                 </div>
                 
                 {/* Social Links */}
-                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
+                <div className="bg-input-bg backdrop-blur-sm rounded-[18px] border border-soft p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                      <IconLink className="w-5 h-5 text-violet-400" />
+                    <h2 className="text-xl font-semibold text-text-primary flex items-center gap-2">
+                      <IconLink className="w-5 h-5 text-gold-accent" />
                       Social Links
                     </h2>
                     <Button 
                       onClick={addSocialLink}
                       variant="outline"
                       size="sm"
-                      className="border-white/20 hover:bg-white/10 text-white rounded-[8px]"
+                      className="border-soft hover:bg-hover-surface text-text-primary rounded-[8px] transition-colors"
                     >
                       <IconPlus className="w-4 h-4 mr-1" />
                       Add Link
@@ -407,10 +408,10 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
                               value={link.platform}
                               onValueChange={(value) => handleSocialLinkChange(link.id, 'platform', value)}
                             >
-                              <SelectTrigger className="bg-white/10 border-white/10 text-white rounded-[8px]">
+                              <SelectTrigger className="bg-input-bg border-soft text-text-primary rounded-[8px] focus:ring-2 focus:ring-gold-glow">
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent className="bg-gray-800 border-white/10 text-white rounded-[8px]">
+                              <SelectContent className="bg-stone-black-2 border-soft text-text-primary rounded-[8px]">
                                 {platformOptions.map((option) => {
                                   const OptionIcon = option.icon
                                   return (
@@ -430,14 +431,14 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
                               value={link.url}
                               onChange={(e) => handleSocialLinkChange(link.id, 'url', e.target.value)}
                               placeholder="https://..."
-                              className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[8px]"
+                              className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[8px] focus:ring-2 focus:ring-gold-glow"
                             />
                           </div>
                           <Button 
                             onClick={() => removeSocialLink(link.id)}
                             variant="outline"
                             size="sm"
-                            className="border-white/20 hover:bg-white/10 text-white rounded-[8px] p-2"
+                            className="border-soft hover:bg-hover-surface text-text-primary rounded-[8px] p-2 transition-colors"
                           >
                             <IconTrash className="w-4 h-4" />
                           </Button>
@@ -448,23 +449,23 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
                 </div>
                 
                 {/* Outreach Information */}
-                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
-                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <IconMail className="w-5 h-5 text-violet-400" />
+                <div className="bg-input-bg backdrop-blur-sm rounded-[18px] border border-soft p-6">
+                  <h2 className="text-xl font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <IconMail className="w-5 h-5 text-gold-accent" />
                     Outreach Information
                   </h2>
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-white">Outreach Type</Label>
+                        <Label className="text-text-primary">Outreach Type</Label>
                         <Select
                           value={formData.outreach_type || ''}
                           onValueChange={(value) => handleChange('outreach_type', value as Client['outreach_type'])}
                         >
-                          <SelectTrigger className="bg-white/10 border-white/10 text-white rounded-[12px]">
+                          <SelectTrigger className="bg-input-bg border-soft text-text-primary rounded-[12px] focus:ring-2 focus:ring-gold-glow">
                             <SelectValue placeholder="Select type" />
                           </SelectTrigger>
-                          <SelectContent className="bg-gray-800 border-white/10 text-white rounded-[12px]">
+                          <SelectContent className="bg-stone-black-2 border-soft text-text-primary rounded-[12px]">
                             <SelectItem value="Cold Email">Cold Email</SelectItem>
                             <SelectItem value="Reedit">Reedit</SelectItem>
                             <SelectItem value="YT Jobs">YT Jobs</SelectItem>
@@ -473,49 +474,49 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="outreach_platform" className="text-white">Outreach Platform</Label>
+                        <Label htmlFor="outreach_platform" className="text-text-primary">Outreach Platform</Label>
                         <Input
                           id="outreach_platform"
                           value={formData.outreach_platform || ''}
                           onChange={(e) => handleChange('outreach_platform', e.target.value)}
                           placeholder="e.g., LinkedIn, Email"
-                          className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
+                          className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px] focus:ring-2 focus:ring-gold-glow"
                         />
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="outreach_date" className="text-white">Outreach Date</Label>
+                        <Label htmlFor="outreach_date" className="text-text-primary">Outreach Date</Label>
                         <Input
                           id="outreach_date"
                           type="date"
                           value={formData.outreach_date ? formData.outreach_date.split('T')[0] : ''}
                           onChange={(e) => handleChange('outreach_date', e.target.value)}
-                          className="bg-white/10 border-white/10 text-white rounded-[12px]"
+                          className="bg-input-bg border-soft text-text-primary rounded-[12px] focus:ring-2 focus:ring-gold-glow"
                         />
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="first_outreach_date" className="text-white">First Outreach Date</Label>
+                        <Label htmlFor="first_outreach_date" className="text-text-primary">First Outreach Date</Label>
                         <Input
                           id="first_outreach_date"
                           type="date"
                           value={formData.first_outreach_date ? formData.first_outreach_date.split('T')[0] : ''}
                           onChange={(e) => handleChange('first_outreach_date', e.target.value)}
-                          className="bg-white/10 border-white/10 text-white rounded-[12px]"
+                          className="bg-input-bg border-soft text-text-primary rounded-[12px] focus:ring-2 focus:ring-gold-glow"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="outreach_link_sent" className="text-white">Outreach Link Sent</Label>
+                      <Label htmlFor="outreach_link_sent" className="text-text-primary">Outreach Link Sent</Label>
                       <Input
                         id="outreach_link_sent"
                         value={formData.outreach_link_sent || ''}
                         onChange={(e) => handleChange('outreach_link_sent', e.target.value)}
                         placeholder="https://example.com/reel"
-                        className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px]"
+                        className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px] focus:ring-2 focus:ring-gold-glow"
                       />
                     </div>
                   </div>
@@ -525,22 +526,22 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
               {/* Right Column - Follow-up & Tags */}
               <div className="space-y-6">
                 {/* Follow-up Information */}
-                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
-                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <IconTag className="w-5 h-5 text-violet-400" />
+                <div className="bg-input-bg backdrop-blur-sm rounded-[18px] border border-soft p-6">
+                  <h2 className="text-xl font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <IconTag className="w-5 h-5 text-gold-accent" />
                     Follow-up Information
                   </h2>
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label className="text-white">Follow-up Status</Label>
+                      <Label className="text-text-primary">Follow-up Status</Label>
                       <Select
                         value={formData.follow_up_status || ''}
                         onValueChange={(value) => handleChange('follow_up_status', value as Client['follow_up_status'])}
                       >
-                        <SelectTrigger className="bg-white/10 border-white/10 text-white rounded-[12px]">
+                        <SelectTrigger className="bg-input-bg border-soft text-text-primary rounded-[12px] focus:ring-2 focus:ring-gold-glow">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
-                        <SelectContent className="bg-gray-800 border-white/10 text-white rounded-[12px]">
+                        <SelectContent className="bg-stone-black-2 border-soft text-text-primary rounded-[12px]">
                           <SelectItem value="Not Started">Not Started</SelectItem>
                           <SelectItem value="In Progress">In Progress</SelectItem>
                           <SelectItem value="Completed">Completed</SelectItem>
@@ -549,33 +550,33 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="follow_up_count" className="text-white">Follow-up Count</Label>
+                      <Label htmlFor="follow_up_count" className="text-text-primary">Follow-up Count</Label>
                       <Input
                         id="follow_up_count"
                         type="number"
                         value={formData.follow_up_count || 0}
                         onChange={(e) => handleChange('follow_up_count', parseInt(e.target.value) || 0)}
-                        className="bg-white/10 border-white/10 text-white rounded-[12px]"
+                        className="bg-input-bg border-soft text-text-primary rounded-[12px] focus:ring-2 focus:ring-gold-glow"
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="next_follow_up_date" className="text-white">Next Follow-up Date</Label>
+                      <Label htmlFor="next_follow_up_date" className="text-text-primary">Next Follow-up Date</Label>
                       <Input
                         id="next_follow_up_date"
                         type="date"
                         value={formData.next_follow_up_date ? formData.next_follow_up_date.split('T')[0] : ''}
                         onChange={(e) => handleChange('next_follow_up_date', e.target.value)}
-                        className="bg-white/10 border-white/10 text-white rounded-[12px]"
+                        className="bg-input-bg border-soft text-text-primary rounded-[12px] focus:ring-2 focus:ring-gold-glow"
                       />
                     </div>
                   </div>
                 </div>
                 
                 {/* Tags */}
-                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
-                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <IconTag className="w-5 h-5 text-violet-400" />
+                <div className="bg-input-bg backdrop-blur-sm rounded-[18px] border border-soft p-6">
+                  <h2 className="text-xl font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <IconTag className="w-5 h-5 text-gold-accent" />
                     Tags
                   </h2>
                   <div className="space-y-3">
@@ -583,16 +584,16 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
                       value={formData.tags || ''}
                       onChange={(e) => handleChange('tags', e.target.value)}
                       placeholder="Enter tags separated by commas"
-                      className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px] min-h-[80px]"
+                      className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px] min-h-[80px] focus:ring-2 focus:ring-gold-glow"
                     />
-                    <p className="text-sm text-white/70">Example: high-priority, video-editing, youtube</p>
+                    <p className="text-sm text-text-secondary">Example: high-priority, video-editing, youtube</p>
                   </div>
                 </div>
                 
                 {/* Notes */}
-                <div className="bg-white/5 backdrop-blur-sm rounded-[18px] border border-white/10 p-6">
-                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <IconNotes className="w-5 h-5 text-violet-400" />
+                <div className="bg-input-bg backdrop-blur-sm rounded-[18px] border border-soft p-6">
+                  <h2 className="text-xl font-semibold text-text-primary mb-4 flex items-center gap-2">
+                    <IconNotes className="w-5 h-5 text-gold-accent" />
                     Notes
                   </h2>
                   <div className="space-y-3">
@@ -600,7 +601,7 @@ export function ClientEditModal({ client, open, onClose, onSave }: ClientEditMod
                       value={formData.notes || ''}
                       onChange={(e) => handleChange('notes', e.target.value)}
                       placeholder="Add any additional notes about this client"
-                      className="bg-white/10 border-white/10 text-white placeholder-white/50 rounded-[12px] min-h-[120px]"
+                      className="bg-input-bg border-soft text-text-primary placeholder-text-muted rounded-[12px] min-h-[120px] focus:ring-2 focus:ring-gold-glow"
                     />
                   </div>
                 </div>

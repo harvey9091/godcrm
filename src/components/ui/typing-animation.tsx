@@ -22,6 +22,11 @@ interface TypingAnimationProps extends MotionProps {
   cursorStyle?: "line" | "block" | "underscore"
 }
 
+// Create MotionComponent outside of the function to avoid creating components during render
+const MotionSpan = motion.create("span", {
+  forwardMotionProps: true,
+});
+
 export function TypingAnimation({
   children,
   words,
@@ -155,19 +160,19 @@ export function TypingAnimation({
   }
 
   return (
-    <MotionComponent
+    <MotionSpan
       ref={elementRef}
-      className={cn("leading-[5rem] tracking-[-0.02em]", className)}
+      className={cn("leading-[5rem] tracking-[-0.02em] text-text-primary", className)}
       {...props}
     >
       {displayedText}
       {shouldShowCursor && (
         <span
-          className={cn("inline-block", blinkCursor && "animate-blink-cursor")}
+          className={cn("inline-block text-text-primary", blinkCursor && "animate-blink-cursor")}
         >
           {getCursorChar()}
         </span>
       )}
-    </MotionComponent>
+    </MotionSpan>
   )
 }

@@ -32,7 +32,7 @@ export default function TestClosedClients() {
     return (
       <DashboardLayout>
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-white">Loading...</h1>
+          <h1 className="text-2xl font-bold text-text-primary">Loading...</h1>
         </div>
       </DashboardLayout>
     )
@@ -41,31 +41,31 @@ export default function TestClosedClients() {
   return (
     <DashboardLayout>
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-white mb-4">Test Closed Clients</h1>
+        <h1 className="text-2xl font-bold text-text-primary mb-4">Test Closed Clients</h1>
         
         {error && (
           <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4 mb-4">
-            <h2 className="text-lg font-semibold text-white mb-2">Error</h2>
-            <p className="text-white">{error}</p>
+            <h2 className="text-lg font-semibold text-text-primary mb-2">Error</h2>
+            <p className="text-text-primary">{error}</p>
           </div>
         )}
         
-        <div className="bg-white/10 border border-white/20 rounded-lg p-4">
-          <h2 className="text-lg font-semibold text-white mb-2">Closed Clients Count: {closedClients.length}</h2>
+        <div className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-lg p-4">
+          <h2 className="text-lg font-semibold text-text-primary mb-2">Closed Clients Count: {closedClients.length}</h2>
           
           {closedClients.length > 0 ? (
             <div className="space-y-2">
               {closedClients.map((client) => (
-                <div key={client.id} className="bg-white/5 border border-white/10 rounded-lg p-3">
-                  <p className="text-white">Name: {client.name}</p>
-                  <p className="text-white">Videos per Month: {client.videosPerMonth}</p>
-                  <p className="text-white">Charge per Video: ${client.chargePerVideo}</p>
-                  <p className="text-white">Monthly Revenue: ${client.monthlyRevenue}</p>
+                <div key={client.id} className="bg-input-bg border border-soft rounded-lg p-3">
+                  <p className="text-text-primary">Name: {client.name}</p>
+                  <p className="text-text-primary">Videos per Month: {client.videosPerMonth}</p>
+                  <p className="text-text-primary">Charge per Video: ${client.chargePerVideo}</p>
+                  <p className="text-text-primary">Monthly Revenue: ${client.monthlyRevenue}</p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-white/70">No closed clients found</p>
+            <p className="text-text-secondary">No closed clients found</p>
           )}
         </div>
       </div>

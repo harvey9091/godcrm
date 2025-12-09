@@ -83,7 +83,7 @@ const AnimatedNumber = ({ value, prefix = '', duration = 1200 }: { value: number
 
   return (
     <span 
-      className={`transition-all duration-300 ${isAnimating ? 'text-white/90' : 'text-white'}`}
+      className={`transition-all duration-300 ${isAnimating ? 'text-text-secondary' : 'text-text-primary'}`}
       aria-live="polite"
     >
       {displayValue}
@@ -353,8 +353,8 @@ export default function DashboardPage() {
     <DashboardLayout>
       {/* Background video for Apple-style grainy effect */}
       <div className="fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(30,30,45,0.6)_0%,rgba(15,15,30,0.9)_100%)]"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjciIG51bU9jdGF2ZXM9IjEwIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIj48L2ZlVHVyYnVsZW5jZT48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ij48L3JlY3Q+PC9zdmc+')] opacity-20"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(29,29,33,0.8)_0%,rgba(10,10,12,0.95)_100%)]"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxmaWx0ZXIgaWQ9Im5vaXNlIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjciIG51bU9jdGF2ZXM9IjEwIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIj48L2ZlVHVyYnVsZW5jZT48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ij48L3JlY3Q+PC9zdmc+')] opacity-10"></div>
       </div>
       
       <div className="flex flex-col min-h-screen relative z-10 animate-fadeInUp">
@@ -362,12 +362,12 @@ export default function DashboardPage() {
         <div className="flex-shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center mb-4 py-4 px-2">
           <div className="mb-4 md:mb-0">
             <TypingAnimation 
-              className="text-5xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent"
+              className="text-5xl font-bold bg-gradient-to-r from-gold-accent to-gold-dim bg-clip-text text-transparent"
             >
               GodCRM
             </TypingAnimation>
             <AnimatedShinyText 
-              className="block text-xl text-white/70 mt-2 text-left w-full max-w-none mx-0"
+              className="block text-xl text-text-secondary mt-2 text-left w-full max-w-none mx-0"
               shimmerWidth={100}
             >
               Your creative agency management solution
@@ -376,7 +376,7 @@ export default function DashboardPage() {
           <div className="flex gap-6">
             <button 
               onClick={() => router.push('/clients')}
-              className="text-lg text-white/80 hover:text-white focus:outline-none border-b border-white/30 hover:border-white pb-1 transition-all cursor-pointer"
+              className="text-lg text-text-secondary hover:text-gold-accent focus:outline-none border-b border-soft hover:border-gold-accent pb-1 transition-all cursor-pointer"
             >
               Manage Clients
             </button>
@@ -388,28 +388,28 @@ export default function DashboardPage() {
           {kpiData.map((kpi: KpiItem, index: number) => (
             <Card 
               key={index} 
-              className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:border-white/20"
+              className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-stone-lg hover:border-gold-accent/30"
               style={{ animationDelay: `${index * 80}ms` }}
             >
               <CardHeader className="pb-3 pt-4">
                 <div className="flex items-center">
-                  <div className="mr-3 text-white p-2.5 bg-white/10 rounded-xl">
+                  <div className="mr-3 text-gold-accent p-2.5 bg-stone-black-2 rounded-xl">
                     {kpi.icon}
                   </div>
-                  <CardTitle className="text-base font-medium text-white/80">
+                  <CardTitle className="text-base font-medium text-text-secondary">
                     {kpi.title}
                   </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="pb-4">
-                <div className="text-4xl font-bold mb-2 text-white">
+                <div className="text-4xl font-bold mb-2 text-text-primary">
                   {kpi.title === 'Revenue' ? (
                     <AnimatedCurrency value={kpi.numericValue} duration={1200} />
                   ) : (
                     <AnimatedNumber value={kpi.numericValue} duration={1200} />
                   )}
                 </div>
-                <p className="text-sm text-white/70">{kpi.change}</p>
+                <p className="text-sm text-text-muted">{kpi.change}</p>
               </CardContent>
             </Card>
           ))}
@@ -420,9 +420,9 @@ export default function DashboardPage() {
           {/* Left Column - Larger */}
           <div className="lg:col-span-3 space-y-5 flex flex-col">
             {/* Revenue Trend Chart - Now shorter */}
-            <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg flex flex-col transition-all duration-300 hover:shadow-xl hover:border-white/20 animate-fadeInUp">
+            <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone flex flex-col transition-all duration-300 hover:shadow-stone-lg animate-fadeInUp">
               <CardHeader className="pb-4 pt-5">
-                <CardTitle className="text-2xl font-semibold text-white">
+                <CardTitle className="text-2xl font-semibold text-text-primary">
                   Revenue Trend
                 </CardTitle>
               </CardHeader>
@@ -430,17 +430,17 @@ export default function DashboardPage() {
                 <div style={{ height: '450px' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(138, 128, 75, 0.3)" vertical={false} />
                       <XAxis 
                         dataKey="name" 
-                        stroke="#ffffff" 
-                        tick={{ fill: '#ffffff', fontSize: 14 }}
+                        stroke="#C9C9C9" 
+                        tick={{ fill: '#C9C9C9', fontSize: 14 }}
                         tickLine={false}
                         axisLine={false}
                       />
                       <YAxis 
-                        stroke="#ffffff" 
-                        tick={{ fill: '#ffffff', fontSize: 14 }}
+                        stroke="#C9C9C9" 
+                        tick={{ fill: '#C9C9C9', fontSize: 14 }}
                         tickFormatter={(value) => `$${value / 1000}k`}
                         domain={[0, 10000]}
                         tickLine={false}
@@ -448,23 +448,23 @@ export default function DashboardPage() {
                       />
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: 'rgba(30, 30, 40, 0.8)', 
+                          backgroundColor: 'rgba(29, 29, 33, 0.9)', 
                           backdropFilter: 'blur(12px)',
-                          border: '1px solid rgba(255,255,255,0.1)',
+                          border: '1px solid rgba(47, 47, 47, 0.5)',
                           borderRadius: '12px',
-                          color: '#ffffff',
-                          boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+                          color: '#F2F2F2',
+                          boxShadow: '0 4px 20px rgba(0,0,0,0.45)'
                         }}
                         formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Revenue']}
                         labelFormatter={(label) => `Month: ${label}`}
-                        itemStyle={{ color: '#ffffff' }}
+                        itemStyle={{ color: '#F2F2F2' }}
                       />
                       <Area 
                         type="monotone" 
                         dataKey="revenue" 
-                        stroke="#ffffff" 
-                        fill="url(#colorRevenueViolet)" 
-                        fillOpacity={0.15}
+                        stroke="#C8A25F" 
+                        fill="url(#colorRevenueGold)" 
+                        fillOpacity={0.2}
                         strokeWidth={3}
                         animationDuration={1000}
                         animationEasing="ease-out"
@@ -472,17 +472,17 @@ export default function DashboardPage() {
                       <Line 
                         type="monotone" 
                         dataKey="revenue" 
-                        stroke="#ffffff" 
+                        stroke="#C8A25F" 
                         strokeWidth={3}
-                        dot={{ r: 4, fill: '#ffffff', stroke: 'rgba(0,0,0,0.2)', strokeWidth: 2 }}
-                        activeDot={{ r: 6, fill: '#ffffff', stroke: 'rgba(0,0,0,0.2)', strokeWidth: 2 }}
+                        dot={{ r: 4, fill: '#C8A25F', stroke: 'rgba(0,0,0,0.2)', strokeWidth: 2 }}
+                        activeDot={{ r: 6, fill: '#C8A25F', stroke: 'rgba(0,0,0,0.2)', strokeWidth: 2 }}
                         animationDuration={1000}
                         animationEasing="ease-out"
                       />
                       <defs>
-                        <linearGradient id="colorRevenueViolet" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#ffffff" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#ffffff" stopOpacity={0.05}/>
+                        <linearGradient id="colorRevenueGold" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#C8A25F" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#C8A25F" stopOpacity={0.05}/>
                         </linearGradient>
                       </defs>
                     </AreaChart>
@@ -492,9 +492,9 @@ export default function DashboardPage() {
             </Card>
 
             {/* Latest Clients - Now Shorter */}
-            <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg flex-shrink-0 transition-all duration-300 hover:shadow-xl hover:border-white/20 animate-fadeInUp">
+            <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone flex-shrink-0 transition-all duration-300 hover:shadow-stone-lg animate-fadeInUp">
               <CardHeader className="pb-4 pt-5">
-                <CardTitle className="text-2xl font-semibold text-white">
+                <CardTitle className="text-2xl font-semibold text-text-primary">
                   Latest Clients
                 </CardTitle>
               </CardHeader>
@@ -502,27 +502,27 @@ export default function DashboardPage() {
                 <div className="h-[180px] overflow-y-auto custom-scrollbar">
                   <div className="space-y-3">
                     {latestClients.map((client) => (
-                      <div key={client.id} className="flex items-center p-3 rounded-[18px] bg-white/5 hover:bg-white/10 transition-all duration-300 border border-white/5 hover:border-white/10">
-                        <div className="flex-shrink-0 w-10 h-10 rounded-[12px] bg-white/10 flex items-center justify-center mr-3">
-                          <TrendingUp className="h-5 w-5 text-white" />
+                      <div key={client.id} className="flex items-center p-3 rounded-[18px] bg-stone-black-2 hover:bg-hover-surface transition-all duration-300 border border-soft hover:border-gold-accent/20">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-[12px] bg-input-bg flex items-center justify-center mr-3">
+                          <TrendingUp className="h-5 w-5 text-text-primary" />
                         </div>
                         <div className="flex-grow">
-                          <h4 className="font-semibold text-white">{client.name}</h4>
-                          <p className="text-sm text-white/70">{client.company || 'No company'}</p>
+                          <h4 className="font-semibold text-text-primary">{client.name}</h4>
+                          <p className="text-sm text-text-muted">{client.company || 'No company'}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-white">{client.email}</p>
-                          <p className="text-sm text-white/70">
+                          <p className="text-sm text-text-primary">{client.email}</p>
+                          <p className="text-sm text-text-muted">
                             {client.created_at ? new Date(client.created_at).toLocaleDateString('en-US') : ''}
                           </p>
                         </div>
-                        <div className="ml-3 text-white/70">
+                        <div className="ml-3 text-text-secondary">
                           <ChevronRight className="h-4 w-4" />
                         </div>
                       </div>
                     ))}
                     {latestClients.length === 0 && (
-                      <div className="text-center py-6 text-white/70">
+                      <div className="text-center py-6 text-text-muted">
                         No clients found
                       </div>
                     )}
@@ -535,9 +535,9 @@ export default function DashboardPage() {
           {/* Right Column - Slimmer */}
           <div className="lg:col-span-1 space-y-5 flex flex-col">
             {/* Client Analytics & Allocation Panel */}
-            <Card className="bg-white/8 backdrop-blur-[20px] border border-white/15 rounded-[18px] shadow-lg flex-grow flex flex-col transition-all duration-300 hover:shadow-xl hover:border-white/20 animate-fadeInUp">
+            <Card className="bg-gradient-to-b from-obsidian-soft to-stone-black-2 border border-soft rounded-[18px] shadow-stone flex-grow flex flex-col transition-all duration-300 hover:shadow-stone-lg animate-fadeInUp">
               <CardHeader className="pb-4 pt-5 flex-shrink-0">
-                <CardTitle className="text-2xl font-semibold flex items-center text-white">
+                <CardTitle className="text-2xl font-semibold flex items-center text-text-primary">
                   <Target className="mr-2 h-6 w-6" />
                   Client Analytics & Allocation
                 </CardTitle>
@@ -546,14 +546,14 @@ export default function DashboardPage() {
                 {/* Top Summary Row */}
                 <div className="mb-5">
                   {/* Top Client */}
-                  <div className="flex items-center justify-between mb-4 p-3 rounded-[18px] bg-white/5">
+                  <div className="flex items-center justify-between mb-4 p-3 rounded-[18px] bg-stone-black-2 border border-soft">
                     <div className="flex items-center">
                       <Trophy className="h-6 w-6 text-yellow-400 mr-3" />
-                      <span className="font-medium text-white">Top Client:</span>
+                      <span className="font-medium text-text-primary">Top Client:</span>
                     </div>
                     <div className="text-right">
-                      <div className="font-semibold text-white">{topClient?.name || 'N/A'}</div>
-                      <div className="text-sm text-white/70">
+                      <div className="font-semibold text-text-primary">{topClient?.name || 'N/A'}</div>
+                      <div className="text-sm text-text-muted">
                         {topClient ? `$${topClient.revenue.toLocaleString()}` : '$0'}
                       </div>
                     </div>
@@ -561,7 +561,7 @@ export default function DashboardPage() {
                   
                   {/* Top 3 Clients */}
                   <div className="mb-4">
-                    <div className="text-base font-medium mb-2 text-white">Top 3 Clients:</div>
+                    <div className="text-base font-medium mb-2 text-text-primary">Top 3 Clients:</div>
                     <div className="space-y-2">
                       {top3Clients.map((client, index) => (
                         <div key={client.id} className="flex items-center justify-between text-sm p-2 rounded-xl">
@@ -569,41 +569,41 @@ export default function DashboardPage() {
                             <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 ${
                               index === 0 ? 'bg-yellow-400 text-black' : 
                               index === 1 ? 'bg-gray-300 text-black' : 
-                              'bg-amber-700 text-white'
+                              'bg-amber-700 text-text-primary'
                             }`}>
                               {index + 1}
                             </span>
-                            <span className="truncate max-w-[90px] font-medium text-white">{client.name}</span>
+                            <span className="truncate max-w-[90px] font-medium text-text-primary">{client.name}</span>
                           </div>
-                          <span className="text-white/70">${(client.revenue / 1000).toFixed(1)}k</span>
+                          <span className="text-text-muted">${(client.revenue / 1000).toFixed(1)}k</span>
                         </div>
                       ))}
                     </div>
                   </div>
                   
                   {/* Total Revenue */}
-                  <div className="flex items-center justify-between p-3 rounded-[18px] bg-white/5">
-                    <span className="font-medium text-white">Total Revenue:</span>
-                    <span className="font-bold text-xl text-white">$<AnimatedNumber value={totalRevenue / 1000} prefix="" duration={1200} />k</span>
+                  <div className="flex items-center justify-between p-3 rounded-[18px] bg-stone-black-2 border border-soft">
+                    <span className="font-medium text-text-primary">Total Revenue:</span>
+                    <span className="font-bold text-xl text-gold-accent">$<AnimatedNumber value={totalRevenue / 1000} prefix="" duration={1200} />k</span>
                   </div>
                 </div>
                 
                 {/* Client Revenue List */}
                 <div className="flex-grow mb-5">
-                  <div className="text-base font-medium mb-2 text-white">All Clients:</div>
+                  <div className="text-base font-medium mb-2 text-text-primary">All Clients:</div>
                   <div className="h-[140px] overflow-y-auto custom-scrollbar">
                     <div className="space-y-2">
                       {clientsWithRevenue.map((client) => (
                         <div 
                           key={client.id} 
-                          className="flex items-center justify-between text-sm p-2 rounded-xl cursor-pointer hover:bg-white/10 transition-colors"
+                          className="flex items-center justify-between text-sm p-2 rounded-xl cursor-pointer hover:bg-hover-surface transition-colors border border-soft"
                           onClick={() => router.push(`/clients/${client.id}`)}
                         >
                           <div className="flex items-center">
                             <div className="w-2.5 h-2.5 rounded-full mr-3" style={{ backgroundColor: `hsl(${client.revenue % 360}, 70%, 60%)` }}></div>
-                            <span className="truncate max-w-[100px] text-white">{client.name}</span>
+                            <span className="truncate max-w-[100px] text-text-primary">{client.name}</span>
                           </div>
-                          <span className="text-white/70">${(client.revenue / 1000).toFixed(1)}k</span>
+                          <span className="text-text-muted">${(client.revenue / 1000).toFixed(1)}k</span>
                         </div>
                       ))}
                     </div>
@@ -613,47 +613,47 @@ export default function DashboardPage() {
                 {/* Suggested Actions & Hiring Allocation */}
                 <div className="space-y-4">
                   {/* Suggested Hire */}
-                  <div className="p-3 rounded-[18px] bg-white/5">
-                    <div className="text-base font-medium mb-1 text-white">Suggested Hire:</div>
-                    <div className="text-white font-semibold">Hire: {suggestedHire}</div>
+                  <div className="p-3 rounded-[18px] bg-stone-black-2 border border-soft">
+                    <div className="text-base font-medium mb-1 text-text-primary">Suggested Hire:</div>
+                    <div className="text-gold-accent font-semibold">Hire: {suggestedHire}</div>
                   </div>
                   
                   {/* Allocation Split */}
                   <div>
-                    <div className="text-base font-medium mb-2 text-white">Recommended Allocation:</div>
+                    <div className="text-base font-medium mb-2 text-text-primary">Recommended Allocation:</div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="p-2 rounded-xl bg-white/5">
+                      <div className="p-2 rounded-xl bg-stone-black-2 border border-soft">
                         <div>Operations</div>
-                        <div className="font-semibold text-white">{allocation.operations.percentage}% ($<AnimatedNumber value={allocation.operations.amount / 1000} prefix="" duration={1200} />k)</div>
+                        <div className="font-semibold text-gold-accent">{allocation.operations.percentage}% ($<AnimatedNumber value={allocation.operations.amount / 1000} prefix="" duration={1200} />k)</div>
                       </div>
-                      <div className="p-2 rounded-xl bg-white/5">
+                      <div className="p-2 rounded-xl bg-stone-black-2 border border-soft">
                         <div>Payroll</div>
-                        <div className="font-semibold text-white">{allocation.payroll.percentage}% ($<AnimatedNumber value={allocation.payroll.amount / 1000} prefix="" duration={1200} />k)</div>
+                        <div className="font-semibold text-gold-accent">{allocation.payroll.percentage}% ($<AnimatedNumber value={allocation.payroll.amount / 1000} prefix="" duration={1200} />k)</div>
                       </div>
-                      <div className="p-2 rounded-xl bg-white/5">
+                      <div className="p-2 rounded-xl bg-stone-black-2 border border-soft">
                         <div>Growth/Ads</div>
-                        <div className="font-semibold text-white">{allocation.growth.percentage}% ($<AnimatedNumber value={allocation.growth.amount / 1000} prefix="" duration={1200} />k)</div>
+                        <div className="font-semibold text-gold-accent">{allocation.growth.percentage}% ($<AnimatedNumber value={allocation.growth.amount / 1000} prefix="" duration={1200} />k)</div>
                       </div>
-                      <div className="p-2 rounded-xl bg-white/5">
+                      <div className="p-2 rounded-xl bg-stone-black-2 border border-soft">
                         <div>Savings</div>
-                        <div className="font-semibold text-white">{allocation.savings.percentage}% ($<AnimatedNumber value={allocation.savings.amount / 1000} prefix="" duration={1200} />k)</div>
+                        <div className="font-semibold text-gold-accent">{allocation.savings.percentage}% ($<AnimatedNumber value={allocation.savings.amount / 1000} prefix="" duration={1200} />k)</div>
                       </div>
                     </div>
                   </div>
                   
                   {/* Time Estimate */}
-                  <div className="p-3 rounded-[18px] bg-white/5">
-                    <div className="text-base font-medium mb-1 text-white">Time Estimate:</div>
-                    <div className="text-white/70">Est. time for top client: {timeEstimate}</div>
+                  <div className="p-3 rounded-[18px] bg-stone-black-2 border border-soft">
+                    <div className="text-base font-medium mb-1 text-text-primary">Time Estimate:</div>
+                    <div className="text-text-muted">Est. time for top client: {timeEstimate}</div>
                   </div>
                 </div>
                 
                 {/* Insights & Recommendations */}
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <div className="text-base font-medium mb-2 text-white">Insights & Recommendations:</div>
+                <div className="mt-4 pt-4 border-t border-soft">
+                  <div className="text-base font-medium mb-2 text-text-primary">Insights & Recommendations:</div>
                   <div className="space-y-2">
                     {insights.map((insight, index) => (
-                      <div key={index} className="text-sm text-white/70 p-3 rounded-xl bg-white/5">
+                      <div key={index} className="text-sm text-text-muted p-3 rounded-xl bg-stone-black-2 border border-soft">
                         {insight}
                       </div>
                     ))}
@@ -672,16 +672,17 @@ export default function DashboardPage() {
           width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(42, 42, 46, 0.1);
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(180deg, #9b5cff, #8b5cf6);
+          background: linear-gradient(180deg, #C8A25F, #9A804B);
           border-radius: 10px;
-          box-shadow: 0 0 4px rgba(155, 92, 255, 0.5);
+          box-shadow: 0 0 4px rgba(200, 162, 95, 0.3);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(180deg, #8b5cf6, #9b5cff);
+          background: linear-gradient(180deg, #9A804B, #C8A25F);
+          box-shadow: 0 0 8px rgba(200, 162, 95, 0.5);
         }
         
         @keyframes fadeInUp {
